@@ -1,28 +1,7 @@
-# Node.js / npm
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-
-# Cloudflare
 .wrangler/
-.dev.vars
-
-# Sistema operativo
 .DS_Store
-Thumbs.db
-desktop.ini
-
-# Editor
 .vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Ficheiros de log
 *.log
-logs/
+wrangler.jsonc
+wrangler.toml
