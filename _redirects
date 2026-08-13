@@ -1,0 +1,5 @@
+# Redirecionar /api/* para as funções Cloudflare
+/api/* /api/:splat 200
+
+# Fallback para SPA
+/* /index.html 200
