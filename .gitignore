@@ -1,7 +1,0 @@
-node_modules/
-.wrangler/
-.DS_Store
-.vscode/
-*.log
-wrangler.jsonc
-wrangler.toml
