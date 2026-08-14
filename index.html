@@ -1,17 +1,2788 @@
+<!DOCTYPE html>
+<html lang="pt" data-theme="dark">
+<head>
+<script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
+<script type="text/javascript">
+    aclib.runAutoTag({
+        zoneId: 'v8jr0vnuut',
+    });
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Beats Ao - Beats exclusivos para artistas e produtores musicais. Ouça e compre beats de alta qualidade.">
+  <title>Beats Ao</title>
+  
+  <link rel="icon" type="image/png" href="logo1.png">
+  <link rel="icon" type="image/x-icon" href="logo.png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <style>
+    /* ============================================================
+       CSS COMPLETO - BEATS AO V1.0
+       ============================================================ */
+    
+    /* ----- VARIÁVEIS ----- */
+    :root {
+      --bg-primary: #08080e;
+      --bg-secondary: #12121a;
+      --bg-card: rgba(20, 20, 30, 0.35);
+      --text-primary: #f0f0f0;
+      --text-secondary: #b5b5c8;
+      --text-muted: #7a7a8a;
+      --gold: #f7c948;
+      --gold-dark: #f0a500;
+      --gold-glow: rgba(247, 201, 72, 0.15);
+      --border-color: rgba(247, 201, 72, 0.08);
+      --border-hover: rgba(247, 201, 72, 0.2);
+      --shadow: 0 20px 40px rgba(0,0,0,0.6);
+      --radius: 40px;
+      --radius-sm: 16px;
+      --transition: 0.25s ease;
+    }
+    
+    [data-theme="light"] {
+      --bg-primary: #f0f0f0;
+      --bg-secondary: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.6);
+      --text-primary: #0a0a0f;
+      --text-secondary: #4a4a5a;
+      --text-muted: #8a8a9a;
+      --border-color: rgba(0, 0, 0, 0.08);
+      --border-hover: rgba(0, 0, 0, 0.2);
+      --shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
 
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
- "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
-  <head>
-    <title>503 Backend.max_conn reached</title>
-  </head>
-  <body>
-    <h1>Error 503 Backend.max_conn reached</h1>
-    <p>Backend.max_conn reached</p>
-    <h3>Error 54113</h3>
-    <p>Details: cache-cpt13824-CPT 1786661196 682804232</p>
-    <hr>
-    <p>Varnish cache server</p>
-  </body>
+    /* ----- RESET ----- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg-primary);
+      background-image: radial-gradient(circle at 10% 20%, var(--bg-secondary) 0%, var(--bg-primary) 90%);
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      color: var(--text-primary);
+      display: flex;
+      justify-content: center;
+      padding: 2rem 1rem 6rem 1rem;
+      position: relative;
+      transition: background 0.3s ease;
+      padding-top: 6rem;
+    }
+    .app { max-width: 1100px; width: 100%; }
+
+    /* ----- MENU FIXO ----- */
+    .menu-fixed {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 999;
+    }
+    .hamburger-menu { position: relative; display: inline-block; }
+    .hamburger-btn {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 0.6rem 1rem;
+      border-radius: 60px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Inter', sans-serif;
+      box-shadow: var(--shadow);
+    }
+    .hamburger-btn:hover { border-color: var(--gold); background: var(--gold-glow); }
+    .hamburger-btn i { color: var(--gold); }
+    .hamburger-btn .btn-label { font-size: 0.8rem; font-weight: 400; }
+    .admin-avatar-small {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--gold);
+      margin-right: 0.1rem;
+    }
+    .hamburger-dropdown {
+      position: absolute;
+      top: 115%;
+      right: 0;
+      background: var(--bg-secondary);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem;
+      min-width: 210px;
+      display: none;
+      box-shadow: var(--shadow);
+      z-index: 100;
+    }
+    .hamburger-dropdown.active { display: block; animation: dropdownIn 0.2s ease forwards; }
+    @keyframes dropdownIn { from { opacity: 0; transform: translateY(-10px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .hamburger-dropdown .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.5rem 1.2rem;
+      border-radius: 12px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.2s;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-family: 'Inter', sans-serif;
+    }
+    .hamburger-dropdown .dropdown-item:hover { background: var(--gold-glow); color: var(--gold); }
+    .hamburger-dropdown .dropdown-item i { width: 20px; color: var(--gold); }
+    .hamburger-dropdown .dropdown-item.danger { color: #ff6b6b; }
+    .hamburger-dropdown .dropdown-item.danger i { color: #ff6b6b; }
+    .hamburger-dropdown .dropdown-item.danger:hover { background: rgba(255, 70, 70, 0.06); }
+    .hamburger-dropdown .dropdown-divider { height: 1px; background: var(--border-color); margin: 0.3rem 0.8rem; }
+    .user-info-display {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.5rem 1.2rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 0.3rem;
+    }
+    .user-info-display .admin-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
+    .user-info-display .user-details { display: flex; flex-direction: column; }
+    .user-info-display .user-name { font-weight: 600; font-size: 0.85rem; color: var(--text-primary); }
+    .user-info-display .user-email { 
+      font-size: 0.7rem; 
+      color: var(--text-muted);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 1px;
+    }
+    .user-info-display .user-email .email-text {
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 1px;
+    }
+    .user-info-display .user-email .email-text.hidden {
+      color: var(--text-muted);
+      opacity: 0.5;
+      letter-spacing: 2px;
+    }
+    .user-info-display .user-email .email-toggle-btn {
+      background: none;
+      border: none;
+      color: var(--gold);
+      cursor: pointer;
+      font-size: 0.7rem;
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+    .user-info-display .user-email .email-toggle-btn:hover {
+      background: var(--gold-glow);
+    }
+    .user-info-display .user-email .email-toggle-btn i {
+      font-size: 0.6rem;
+    }
+
+    /* ----- HEADER ----- */
+    .header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .logo-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      text-decoration: none;
+    }
+    .logo-wrapper:hover { opacity: 0.8; }
+    .logo {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: none;
+      box-shadow: 0 0 30px var(--gold-glow);
+      object-fit: cover;
+      background: var(--bg-secondary);
+    }
+    .brand {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .subtitle {
+      font-weight: 300;
+      font-size: 0.85rem;
+      letter-spacing: 4px;
+      color: var(--text-secondary);
+      margin-top: 0.1rem;
+      display: inline-block;
+    }
+
+    /* ----- ADMIN TOOLBAR ----- */
+    .admin-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+      width: 100%;
+    }
+    .admin-toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+    .admin-toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .search-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+      border-radius: 60px;
+      padding: 0.2rem 0.2rem 0.2rem 1rem;
+      transition: 0.2s;
+      flex: 1;
+      min-width: 140px;
+    }
+    .search-container:focus-within { border-color: var(--gold); }
+    .search-container i { color: var(--text-muted); font-size: 0.8rem; }
+    .search-container input {
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      padding: 0.3rem 0;
+      width: 100%;
+      min-width: 80px;
+      outline: none;
+    }
+    .search-container input::placeholder { color: var(--text-muted); }
+    .search-container .clear-search {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.2rem 0.6rem;
+      font-size: 0.7rem;
+      display: none;
+    }
+    .search-container .clear-search.visible { display: block; }
+
+    .filter-select, .sort-select {
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+      border-radius: 60px;
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      padding: 0.3rem 1rem;
+      cursor: pointer;
+      outline: none;
+      transition: 0.2s;
+      min-width: 100px;
+    }
+    .filter-select:focus, .sort-select:focus { border-color: var(--gold); }
+    .filter-select option, .sort-select option { background: var(--bg-secondary); }
+
+    .cart-btn {
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 0.3rem 1rem;
+      border-radius: 60px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'Inter', sans-serif;
+    }
+    .cart-btn:hover { border-color: var(--gold); background: var(--gold-glow); }
+    .cart-btn i { color: var(--gold); }
+    .cart-btn .cart-count {
+      background: var(--gold);
+      color: #0a0a0f;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.05rem 0.4rem;
+      border-radius: 30px;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    /* ----- TOAST ----- */
+    .toast-container {
+      position: fixed;
+      top: 5rem;
+      right: 2rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      max-width: 420px;
+      width: 100%;
+      pointer-events: none;
+    }
+    .toast {
+      background: rgba(18, 18, 26, 0.92);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.4rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      transform: translateX(120%);
+      animation: slideIn 0.4s ease forwards;
+      pointer-events: auto;
+    }
+    .toast.removing { animation: slideOut 0.3s ease forwards; }
+    .toast-icon {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      margin-top: 0.1rem;
+    }
+    .toast-icon.success { background: rgba(37, 211, 102, 0.15); color: #25D366; border: 1px solid rgba(37, 211, 102, 0.2); }
+    .toast-icon.error { background: rgba(255, 70, 70, 0.15); color: #ff6b6b; border: 1px solid rgba(255, 70, 70, 0.2); }
+    .toast-icon.info { background: var(--gold-glow); color: var(--gold); border: 1px solid var(--border-color); }
+    .toast-content { flex: 1; }
+    .toast-title { font-weight: 600; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 0.1rem; }
+    .toast-message { font-weight: 300; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; }
+    .toast-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; padding: 0.2rem; transition: 0.2s; flex-shrink: 0; }
+    .toast-close:hover { color: var(--text-primary); }
+    @keyframes slideIn { to { transform: translateX(0); } }
+    @keyframes slideOut { to { transform: translateX(120%); opacity: 0; } }
+
+    /* ----- LOADING ----- */
+    .loading-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+      gap: 1.5rem;
+    }
+    .loading-wave { display: flex; gap: 0.3rem; align-items: center; justify-content: center; }
+    .loading-wave span {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: wave 1.2s ease-in-out infinite;
+    }
+    .loading-wave span:nth-child(1) { animation-delay: 0s; }
+    .loading-wave span:nth-child(2) { animation-delay: 0.15s; }
+    .loading-wave span:nth-child(3) { animation-delay: 0.3s; }
+    .loading-wave span:nth-child(4) { animation-delay: 0.45s; }
+    .loading-wave span:nth-child(5) { animation-delay: 0.6s; }
+    .loading-wave span:nth-child(6) { animation-delay: 0.75s; }
+    .loading-wave span:nth-child(7) { animation-delay: 0.9s; }
+    .loading-wave span:nth-child(8) { animation-delay: 1.05s; }
+    @keyframes wave {
+      0%, 40%, 100% { transform: scale(0.6); opacity: 0.3; background: var(--gold); }
+      20% { transform: scale(1.2); opacity: 1; background: var(--gold-dark); box-shadow: 0 0 20px var(--gold-glow); }
+    }
+    .loading-text {
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--text-secondary);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+    .loading-progress { width: 150px; height: 2px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+    .loading-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-dark));
+      border-radius: 10px;
+      animation: progress 2s ease-in-out infinite;
+    }
+    @keyframes progress { 0% { width: 0%; } 50% { width: 70%; } 100% { width: 100%; } }
+
+    /* ----- BEATS LIST ----- */
+    .beats-list { display: flex; flex-direction: column; gap: 1.5rem; margin-top: 0.5rem; }
+    .beat-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(14px);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      padding: 1.2rem 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      flex-wrap: wrap;
+      position: relative;
+    }
+    .beat-card:hover { border-color: var(--border-hover); box-shadow: 0 25px 50px rgba(0,0,0,0.8), 0 0 0 1px var(--border-hover); }
+    
+    .beat-card .popularity-badge {
+      position: absolute;
+      top: -0.3rem;
+      left: 1.8rem;
+      background: var(--gold);
+      color: #0a0a0f;
+      padding: 0.15rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 20px var(--gold-glow);
+      z-index: 2;
+    }
+    .beat-card .popularity-badge i {
+      margin-right: 0.3rem;
+      font-size: 0.5rem;
+    }
+    
+    .card-edit-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      backdrop-filter: blur(4px);
+      cursor: pointer;
+      transition: 0.2s;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+    }
+    .card-edit-btn.visible { display: flex; }
+    .card-edit-btn:hover { background: var(--gold-glow); color: var(--gold); border-color: var(--gold); }
+
+    /* ----- PLAYER ----- */
+    .player-wrapper {
+      flex: 0 0 160px;
+      width: 160px;
+      height: 160px;
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+      background: var(--bg-secondary);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.7);
+      margin-top: 0.5rem;
+      cursor: pointer;
+    }
+    .player-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: blur(8px) brightness(0.6);
+      transform: scale(1.05);
+    }
+    .player-overlay {
+      position: absolute;
+      inset: 0;
+      backdrop-filter: blur(12px);
+      background: rgba(10, 10, 15, 0.35);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 0.6rem;
+      color: white;
+    }
+    .player-artist {
+      font-size: 0.5rem;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #d4d4e0;
+      background: rgba(0,0,0,0.3);
+      padding: 0.1rem 0.5rem;
+      border-radius: 30px;
+      backdrop-filter: blur(4px);
+      margin-bottom: 0.1rem;
+    }
+    .player-title {
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-align: center;
+      line-height: 1.2;
+      margin: 0.1rem 0 0.1rem;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+    .player-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-top: 0.1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn-play {
+      background: var(--gold);
+      border: none;
+      color: #0a0a0f;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px var(--gold-glow);
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .btn-play:hover { transform: scale(1.04); background: var(--gold-dark); }
+    .btn-next {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #eee;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(6px);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-next:hover { background: rgba(255,255,255,0.2); }
+    .btn-playlist {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #d0d0dd;
+      padding: 0.1rem 0.5rem;
+      border-radius: 40px;
+      font-size: 0.55rem;
+      font-weight: 400;
+      backdrop-filter: blur(4px);
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      transition: 0.2s;
+    }
+    .btn-playlist:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .btn-playlist.added { background: rgba(37, 211, 102, 0.1); color: #25D366; border-color: rgba(37, 211, 102, 0.15); }
+    .btn-playlist.added:hover { background: rgba(37, 211, 102, 0.15); }
+    .progress-area {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin: 0.05rem 0 0.05rem;
+      padding: 0 0.1rem;
+    }
+    .progress-bar {
+      flex: 1;
+      height: 2px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      appearance: none;
+      -webkit-appearance: none;
+      outline: none;
+    }
+    .progress-bar::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      cursor: pointer;
+      box-shadow: 0 0 12px var(--gold-glow);
+    }
+    .progress-bar::-moz-range-thumb { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); cursor: pointer; border: none; }
+    .time-display { font-size: 0.5rem; font-weight: 300; color: #bfbfd0; min-width: 28px; }
+    .volume-wrap { display: flex; align-items: center; gap: 0.15rem; margin-top: 0.05rem; }
+    .volume-wrap i { font-size: 0.55rem; color: #b0b0c0; }
+    .volume-slider {
+      width: 30px;
+      height: 2px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      appearance: none;
+      -webkit-appearance: none;
+      outline: none;
+    }
+    .volume-slider::-webkit-slider-thumb { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); cursor: pointer; }
+    .volume-slider::-moz-range-thumb { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); border: none; }
+    .badge-genre {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(6px);
+      padding: 0.05rem 0.5rem;
+      border-radius: 30px;
+      font-size: 0.45rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: var(--gold);
+      border: 1px solid var(--border-color);
+      text-transform: uppercase;
+    }
+
+    /* ----- BOTÕES DOWNLOAD ----- */
+    .download-buttons {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.3rem;
+    }
+    .btn-download {
+      padding: 0.2rem 1rem;
+      border: none;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: 'Inter', sans-serif;
+      color: #fff;
+    }
+    .btn-download:hover { transform: scale(1.04); }
+    .btn-mp3 {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+    }
+    .btn-mp3:hover { box-shadow: 0 6px 25px rgba(245, 158, 11, 0.35); }
+    .btn-wav {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+    }
+    .btn-wav:hover { box-shadow: 0 6px 25px rgba(59, 130, 246, 0.35); }
+    .btn-download i { margin-right: 0.2rem; font-size: 0.6rem; }
+
+    /* ----- BEAT INFO ----- */
+    .beat-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      min-width: 140px;
+    }
+    .beat-title {
+      font-weight: 700;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .beat-title i { color: var(--gold); font-size: 0.9rem; opacity: 0.7; }
+    .beat-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin: 0.05rem 0;
+    }
+    .beat-genre {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 300;
+      letter-spacing: 0.2px;
+      background: rgba(255,255,255,0.04);
+      padding: 0.05rem 0.6rem;
+      border-radius: 30px;
+      border: 1px solid var(--border-color);
+    }
+    .beat-genre i { color: var(--gold); margin-right: 3px; }
+    .beat-price {
+      display: inline-block;
+      background: var(--gold-glow);
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(4px);
+      padding: 0.1rem 0.8rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--gold);
+    }
+    .beat-price i { margin-right: 4px; color: var(--gold-dark); }
+    .beat-exclusivo {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-weight: 300;
+      letter-spacing: 0.5px;
+      margin-top: -0.05rem;
+    }
+    .beat-exclusivo i { color: var(--gold); margin-right: 3px; font-size: 0.6rem; }
+    .beat-stats {
+      display: flex;
+      gap: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+    .beat-stats i { color: var(--gold); margin-right: 2px; }
+    .beat-plays {
+      transition: color 0.3s;
+    }
+    .beat-plays.highlight {
+      color: var(--gold);
+    }
+    .beat-rating {
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+    .beat-rating .stars {
+      color: var(--gold);
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+    }
+    .beat-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.2rem;
+    }
+    .btn-share {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 0.25rem 1rem;
+      border-radius: 60px;
+      font-size: 0.7rem;
+      font-weight: 400;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'Inter', sans-serif;
+      backdrop-filter: blur(4px);
+    }
+    .btn-share:hover { background: var(--gold-glow); border-color: var(--gold); color: var(--gold); }
+    .btn-share i { font-size: 0.8rem; }
+    .btn-negociar {
+      background: linear-gradient(135deg, #25D366, #1ebe5c);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: white;
+      padding: 0.25rem 1.2rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      box-shadow: 0 8px 20px rgba(37, 211, 102, 0.2);
+      transition: 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+      letter-spacing: 0.3px;
+      backdrop-filter: blur(4px);
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-negociar i { font-size: 0.9rem; }
+    .btn-negociar:hover { transform: scale(1.02); box-shadow: 0 10px 28px rgba(37, 211, 102, 0.35); background: linear-gradient(135deg, #2fd16e, #1ebe5c); }
+    .btn-cart {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 0.25rem 1rem;
+      border-radius: 60px;
+      font-size: 0.7rem;
+      font-weight: 400;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-cart:hover { background: var(--gold-glow); border-color: var(--gold); color: var(--gold); }
+    .btn-cart.in-cart { background: rgba(37, 211, 102, 0.1); color: #25D366; border-color: rgba(37, 211, 102, 0.15); }
+
+    /* ----- FOOTER ----- */
+    .footer {
+      margin-top: 3rem;
+      padding: 1.5rem 0 0.5rem;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 300;
+      font-size: 0.85rem;
+    }
+    .social-icons { display: flex; gap: 1.5rem; }
+    .social-icons .social-link {
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      transition: 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+    .social-icons .social-link:hover { color: var(--gold); transform: translateY(-2px); }
+
+    /* ----- MODALS ----- */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.8rem 2rem;
+      max-width: 550px;
+      width: 100%;
+      backdrop-filter: blur(20px);
+      box-shadow: var(--shadow);
+      color: var(--text-primary);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal::-webkit-scrollbar { width: 4px; }
+    .modal::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+    .modal::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
+    .modal h2 {
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 1.3rem;
+    }
+    .modal label {
+      display: block;
+      font-weight: 400;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin: 0.6rem 0 0.15rem;
+      letter-spacing: 0.5px;
+    }
+    .modal input, .modal select, .modal textarea {
+      width: 100%;
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+      border: 1px solid var(--border-color);
+      background: rgba(255,255,255,0.04);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: 0.2s;
+    }
+    .modal input:focus, .modal select:focus, .modal textarea:focus {
+      border-color: var(--gold);
+      background: rgba(255,255,255,0.06);
+    }
+    .modal textarea { border-radius: 16px; min-height: 70px; resize: vertical; }
+    .modal input[type="file"] {
+      padding: 0.3rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px dashed var(--border-color);
+    }
+    .modal input[type="file"]::-webkit-file-upload-button {
+      background: var(--gold-glow);
+      border: 1px solid var(--border-color);
+      color: var(--gold);
+      padding: 0.3rem 0.8rem;
+      border-radius: 30px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+    }
+    .modal .file-status { font-size: 0.65rem; color: var(--text-muted); margin-top: 0.1rem; }
+    .modal .modal-actions {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 1.5rem;
+      justify-content: flex-end;
+    }
+    .modal .modal-actions button {
+      padding: 0.5rem 1.5rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.2s;
+      border: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .modal .btn-cancel {
+      background: rgba(255,255,255,0.04);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+    }
+    .modal .btn-cancel:hover { background: rgba(255,255,255,0.08); }
+    .modal .btn-save {
+      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+      color: #0a0a0f;
+      font-weight: 700;
+    }
+    .modal .btn-save:hover { transform: scale(1.04); box-shadow: 0 0 30px var(--gold-glow); }
+    .modal .btn-primary {
+      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+      color: #0a0a0f;
+      font-weight: 700;
+      padding: 0.5rem 1.5rem;
+      border-radius: 60px;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+    }
+    .modal .btn-primary:hover { transform: scale(1.04); box-shadow: 0 0 30px var(--gold-glow); }
+    .modal .login-error { color: #ff6b6b; font-size: 0.75rem; margin-top: 0.5rem; display: none; }
+
+    /* ----- PLAYLIST MODAL ----- */
+    #playlistContainer {
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+    #playlistContainer::-webkit-scrollbar { width: 4px; }
+    #playlistContainer::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
+    #playlistContainer::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+    .playlist-item {
+      background: rgba(255,255,255,0.04);
+      border-radius: var(--radius-sm);
+      padding: 0.8rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      border: 1px solid var(--border-color);
+      transition: 0.2s;
+      margin-bottom: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .playlist-item:hover { border-color: var(--border-hover); background: rgba(255,255,255,0.06); }
+    .playlist-item .cover { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+    .playlist-item .info { flex: 1; min-width: 100px; }
+    .playlist-item .info .title { font-weight: 600; font-size: 0.9rem; }
+    .playlist-item .info .sub { font-size: 0.7rem; color: var(--text-secondary); }
+    .playlist-item .actions { display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; }
+    .playlist-item .btn-play-mini {
+      background: var(--gold-glow);
+      color: var(--gold);
+      border: 1px solid var(--border-color);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+    }
+    .playlist-item .btn-play-mini:hover { background: rgba(247, 201, 72, 0.2); transform: scale(1.05); }
+    .playlist-item .btn-play-mini.playing { background: var(--gold); color: #0a0a0f; }
+    .playlist-item .btn-remove {
+      background: rgba(255, 70, 70, 0.08);
+      color: #ff6b6b;
+      border: 1px solid rgba(255, 70, 70, 0.08);
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.7rem;
+      transition: 0.2s;
+    }
+    .playlist-item .btn-remove:hover { background: rgba(255, 70, 70, 0.15); border-color: rgba(255, 70, 70, 0.2); }
+    .playlist-item .progress-mini { width: 60px; height: 2px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+    .playlist-item .progress-mini-bar { height: 100%; width: 0%; background: var(--gold); border-radius: 10px; transition: width 0.1s; }
+    .playlist-item .time-mini { font-size: 0.65rem; color: var(--text-muted); min-width: 30px; }
+    .empty-playlist { text-align: center; padding: 2rem 0; color: var(--text-muted); }
+    .empty-playlist i { font-size: 2.5rem; display: block; opacity: 0.3; margin-bottom: 0.8rem; }
+    .empty-playlist p { font-weight: 300; font-size: 0.9rem; }
+    .empty-playlist .sub { font-size: 0.75rem; margin-top: 0.2rem; }
+
+    /* ----- CART MODAL ----- */
+    .cart-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item .info { flex: 1; }
+    .cart-item .info .title { font-weight: 600; font-size: 0.9rem; }
+    .cart-item .info .sub { font-size: 0.75rem; color: var(--text-secondary); }
+    .cart-item .remove-item {
+      background: none;
+      border: none;
+      color: #ff6b6b;
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 0.2rem 0.4rem;
+    }
+    .cart-total {
+      text-align: right;
+      padding-top: 0.8rem;
+      border-top: 2px solid var(--border-color);
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    .cart-total span { color: var(--gold); }
+
+    /* ----- SHARE TOAST ----- */
+    .share-toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-secondary);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.6rem 1.5rem;
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: translateX(-50%) translateY(20px);
+      pointer-events: none;
+    }
+    .share-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+    .share-toast i { color: var(--gold); margin-right: 0.5rem; }
+
+    /* ----- PREVIEW ----- */
+    .preview-container { display: flex; gap: 0.8rem; margin: 0.3rem 0; flex-wrap: wrap; }
+    .preview-item { background: rgba(255,255,255,0.04); border-radius: 12px; padding: 0.4rem; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 0.4rem; }
+    .preview-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
+    .preview-item i { font-size: 1.5rem; color: var(--gold); }
+
+    /* ----- THEME TOGGLE ----- */
+    .theme-toggle {
+      position: fixed;
+      bottom: 80px;
+      right: 16px;
+      z-index: 100;
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      box-shadow: var(--shadow);
+    }
+    .theme-toggle:hover { transform: scale(1.05); border-color: var(--gold); }
+
+    /* ----- RESPONSIVE ----- */
+    @media (max-width: 850px) {
+      body { padding-top: 5rem; }
+      .admin-toolbar { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+      .admin-toolbar-left { flex-wrap: wrap; }
+      .admin-toolbar-right { justify-content: center; }
+      .search-container { min-width: 100px; }
+      .beat-card { flex-direction: column; align-items: center; text-align: center; padding: 1.2rem; padding-top: 1.8rem; }
+      .player-wrapper { flex: 0 0 150px; width: 150px; height: 150px; }
+      .beat-info { align-items: center; width: 100%; }
+      .beat-meta { justify-content: center; }
+      .beat-actions { justify-content: center; }
+      .download-buttons { justify-content: center; }
+      .modal { padding: 1.2rem 1.5rem; }
+      .toast-container { right: 1rem; left: 1rem; max-width: none; top: 5rem; }
+      .hamburger-dropdown { right: -10px; min-width: 180px; }
+      .playlist-item { flex-direction: column; text-align: center; }
+      .playlist-item .info { width: 100%; }
+      .playlist-item .actions { justify-content: center; }
+      .theme-toggle { bottom: 80px; right: 12px; width: 34px; height: 34px; font-size: 0.9rem; }
+      .filter-select, .sort-select { min-width: 70px; font-size: 0.7rem; padding: 0.2rem 0.6rem; }
+      .menu-fixed { top: 0.8rem; right: 0.8rem; }
+      .hamburger-btn { padding: 0.4rem 0.8rem; font-size: 0.9rem; }
+      .hamburger-btn .btn-label { display: none; }
+      .beat-card .popularity-badge { top: -0.2rem; left: 1rem; font-size: 0.5rem; padding: 0.1rem 0.6rem; }
+    }
+    @media (max-width: 480px) {
+      body { padding-top: 4.5rem; }
+      .brand { font-size: 1.6rem; }
+      .logo { width: 50px; height: 50px; }
+      .player-wrapper { flex: 0 0 120px; width: 120px; height: 120px; }
+      .search-container input { font-size: 0.75rem; min-width: 60px; }
+      .filter-select, .sort-select { font-size: 0.65rem; padding: 0.15rem 0.5rem; min-width: 60px; }
+      .toast-container { top: 4.5rem; }
+      .menu-fixed { top: 0.5rem; right: 0.5rem; }
+      .hamburger-btn { padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+      .beat-card .popularity-badge { top: -0.15rem; left: 0.8rem; font-size: 0.45rem; padding: 0.05rem 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- MENU FIXO -->
+<div class="menu-fixed">
+  <div class="hamburger-menu">
+    <button class="hamburger-btn" id="menuBtn">
+      <span id="avatarContainer"></span>
+      <i class="fas fa-bars"></i>
+      <span class="btn-label" id="menuLabel">Menu</span>
+    </button>
+    <div class="hamburger-dropdown" id="mainDropdown">
+      <div class="user-info-display" id="userInfoDisplay" style="display:none;">
+        <img src="eu.jpg" alt="Admin" class="admin-avatar" id="adminAvatar">
+        <div class="user-details">
+          <span class="user-name" id="userNameDisplay">Administrador</span>
+          <div class="user-email" id="userEmailDisplay">
+            <span class="email-text" id="emailText">usuario@email.com</span>
+            <button class="email-toggle-btn" id="toggleEmailBtn" title="Ocultar/Mostrar email">
+              <i class="fas fa-eye" id="emailEyeIcon"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="dropdown-divider" id="dividerAfterUser" style="display:none;"></div>
+      
+      <button class="dropdown-item" id="dropdownLogin" style="display:flex;">
+        <i class="fas fa-sign-in-alt"></i> Admin
+      </button>
+      
+      <button class="dropdown-item" id="dropdownNewBeat" style="display:none;">
+        <i class="fas fa-plus"></i> Lançar Beat
+      </button>
+      <button class="dropdown-item" id="dropdownToggleEdit" style="display:none;">
+        <i class="fas fa-edit"></i> Editar
+      </button>
+      <button class="dropdown-item" id="dropdownDashboard" style="display:none;">
+        <i class="fas fa-chart-bar"></i> Dashboard
+      </button>
+      
+      <button class="dropdown-item" id="dropdownPlaylist">
+        <i class="fas fa-music"></i> Minha Playlist
+        <span id="playlistCount" style="background:rgba(247,201,72,0.1);color:#f7c948;font-size:0.65rem;padding:0.05rem 0.5rem;border-radius:30px;margin-left:auto;">0</span>
+      </button>
+      
+      <button class="dropdown-item" id="dropdownProfile">
+        <i class="fas fa-user"></i> Perfil do Produtor
+      </button>
+      
+      <button class="dropdown-item" id="dropdownAbout">
+        <i class="fas fa-info-circle"></i> Sobre & Contato
+      </button>
+      
+      <div class="dropdown-divider" id="dividerBeforeLogout" style="display:none;"></div>
+      <button class="dropdown-item danger" id="dropdownLogout" style="display:none;">
+        <i class="fas fa-sign-out-alt"></i> Sair
+      </button>
+      
+      <div style="padding: 0.4rem 1.2rem; font-size: 0.6rem; color: var(--text-muted); border-top: 1px solid var(--border-color); margin-top: 0.2rem;">
+        Beats Ao v1.0
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+<div class="share-toast" id="shareToast"><i class="fas fa-check-circle"></i> Link copiado</div>
+<button class="theme-toggle" id="themeToggle" title="Alternar tema"><i class="fas fa-moon"></i></button>
+
+<div class="app">
+
+  <header class="header">
+    <a href="?" class="logo-wrapper" id="logoLink">
+      <img src="logo.png" alt="Beats Ao" class="logo">
+      <span class="brand">Beats Ao</span>
+    </a>
+    <div class="subtitle">ouça e compre</div>
+  </header>
+
+  <div class="admin-toolbar">
+    <div class="admin-toolbar-left">
+      <div class="search-container">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Buscar beat ou artista...">
+        <button class="clear-search" id="clearSearch"><i class="fas fa-times"></i></button>
+      </div>
+      <select class="filter-select" id="filterGenre">
+        <option value="all">Todos os gêneros</option>
+      </select>
+      <select class="sort-select" id="sortBy">
+        <option value="recent">Mais recentes</option>
+        <option value="popular">Mais populares</option>
+        <option value="price-low">Menor preço</option>
+        <option value="price-high">Maior preço</option>
+        <option value="rating">Melhor avaliação</option>
+      </select>
+    </div>
+    <div class="admin-toolbar-right">
+      <button class="cart-btn" id="cartBtn">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="loading" class="loading-wrapper">
+    <div class="loading-wave">
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <div class="loading-text">Carregando Beats</div>
+    <div class="loading-progress">
+      <div class="loading-progress-bar"></div>
+    </div>
+  </div>
+
+  <div class="beats-list" id="beatsContainer"></div>
+
+  <footer class="footer">
+    <div class="social-icons">
+      <button class="social-link" onclick="window.open('https://www.youtube.com/channel/UCZHpXbGkLKXgQxMROaWzR5w','_blank')"><i class="fab fa-youtube"></i></button>
+      <button class="social-link" onclick="window.open('https://www.instagram.com/agostinhoagt/','_blank')"><i class="fab fa-instagram"></i></button>
+      <button class="social-link" onclick="window.open('https://www.facebook.com/profile.php?id=100080875782151','_blank')"><i class="fab fa-facebook-f"></i></button>
+      <button class="social-link" onclick="window.open('https://wa.me/244926261011','_blank')"><i class="fab fa-whatsapp"></i></button>
+    </div>
+    <div>© 2026 Beats Ao · todos os direitos reservados</div>
+  </footer>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <h2><i class="fas fa-lock"></i> Administrador</h2>
+    <form id="loginForm">
+      <label for="loginEmail">Email</label>
+      <input type="email" id="loginEmail" placeholder="seuemail@gmail.com" required>
+      <label for="loginPass">Senha</label>
+      <input type="password" id="loginPass" placeholder="••••••••" required>
+      <div class="login-error" id="loginError">Email ou senha inválidos.</div>
+      <div class="modal-actions" style="justify-content: center; flex-direction: column; gap: 0.6rem;">
+        <button type="submit" class="btn-primary" style="width:100%;"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+        <button type="button" class="btn-cancel" id="loginCancel" style="width:100%;">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="formModal">
+  <div class="modal">
+    <h2 id="modalTitle"><i class="fas fa-wave-square"></i> <span>Novo Beat</span></h2>
+    <form id="beatForm" enctype="multipart/form-data">
+      <label for="fTitle">Título *</label>
+      <input type="text" id="fTitle" placeholder="Ex: Aurora" required>
+      <label for="fArtist">Artista *</label>
+      <input type="text" id="fArtist" placeholder="Ex: Pedro" required>
+      <label for="fGenre">Gênero *</label>
+      <input type="text" id="fGenre" placeholder="Ex: Trap" required>
+      <label for="fPrice">Preço *</label>
+      <input type="text" id="fPrice" placeholder="Kz 3.500" required>
+      <label for="fBpm">BPM</label>
+      <input type="text" id="fBpm" placeholder="Ex: 140">
+      <label for="fKey">Tom</label>
+      <input type="text" id="fKey" placeholder="Ex: A Minor">
+      <label for="fCoverFile">Imagem de Capa</label>
+      <input type="file" id="fCoverFile" accept="image/*">
+      <div class="file-status" id="coverStatus">Selecionar</div>
+      <label for="fAudioStream">Link de Streaming (MP3 - OpenDrive) *</label>
+      <input type="url" id="fAudioStream" placeholder="https://od.lk/s/..." required>
+      <div class="file-status" style="font-size:0.65rem;color:var(--text-muted);">Link para ouvir no player</div>
+      <label for="fAudioMp3">Link Download MP3 (OpenDrive)</label>
+      <input type="url" id="fAudioMp3" placeholder="https://od.lk/d/...">
+      <div class="file-status" style="font-size:0.65rem;color:var(--text-muted);">Link para baixar MP3</div>
+      <label for="fAudioWav">Link Download WAV (OpenDrive)</label>
+      <input type="url" id="fAudioWav" placeholder="https://od.lk/d/...">
+      <div class="file-status" style="font-size:0.65rem;color:var(--text-muted);">Link para baixar WAV</div>
+      <label for="fPassword">Senha de Download</label>
+      <input type="text" id="fPassword" placeholder="Ex: Love2026">
+      <div class="file-status" style="font-size:0.65rem;color:var(--text-muted);">Senha para liberar o download</div>
+      <div class="preview-container" id="previewContainer"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" id="formCancel">Cancelar</button>
+        <button type="submit" class="btn-save" id="modalSave">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="playlistModal">
+  <div class="modal" style="max-width: 700px;">
+    <h2><i class="fas fa-music"></i> Minha Playlist</h2>
+    <div id="playlistContainer"></div>
+    <div class="empty-playlist" id="emptyPlaylist" style="display:none;">
+      <i class="fas fa-headphones"></i>
+      <p>Sua playlist está vazia</p>
+      <p class="sub">Adicione beats clicando em "Add" nos cards</p>
+    </div>
+    <div class="modal-actions"><button type="button" class="btn-cancel" id="playlistCancel">Fechar</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="cartModal">
+  <div class="modal" style="max-width: 600px;">
+    <h2><i class="fas fa-shopping-cart"></i> Meu Carrinho</h2>
+    <div id="cartContainer"></div>
+    <div class="empty-cart" id="emptyCart" style="text-align:center;padding:1.5rem 0;color:var(--text-muted);">
+      <i class="fas fa-shopping-bag" style="font-size:2rem;display:block;opacity:0.3;margin-bottom:0.8rem;"></i>
+      <p>Seu carrinho está vazio</p>
+    </div>
+    <div class="cart-total" id="cartTotal" style="display:none;">Total: <span id="cartTotalValue">Kz 0</span></div>
+    <div class="modal-actions">
+      <button type="button" class="btn-cancel" id="cartCancel">Fechar</button>
+      <button type="button" class="btn-save" id="cartCheckout"><i class="fab fa-whatsapp"></i> Finalizar Compra</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dashboardModal">
+  <div class="modal" style="max-width: 600px;">
+    <h2><i class="fas fa-chart-bar"></i> Dashboard</h2>
+    <div id="dashboardContent" style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
+      <div style="background:var(--bg-card);border-radius:var(--radius-sm);padding:1.2rem;text-align:center;border:1px solid var(--border-color);">
+        <div style="font-size:1.8rem;font-weight:800;color:var(--gold);" id="totalBeats">0</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);">Total de Beats</div>
+      </div>
+      <div style="background:var(--bg-card);border-radius:var(--radius-sm);padding:1.2rem;text-align:center;border:1px solid var(--border-color);">
+        <div style="font-size:1.8rem;font-weight:800;color:var(--gold);" id="totalPlays">0</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);">Total de Plays</div>
+      </div>
+      <div style="background:var(--bg-card);border-radius:var(--radius-sm);padding:1.2rem;text-align:center;border:1px solid var(--border-color);">
+        <div style="font-size:1.8rem;font-weight:800;color:var(--gold);" id="avgRating">0.0</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);">Avaliação Média</div>
+      </div>
+      <div style="background:var(--bg-card);border-radius:var(--radius-sm);padding:1.2rem;text-align:center;border:1px solid var(--border-color);">
+        <div style="font-size:1.8rem;font-weight:800;color:var(--gold);" id="topGenre">-</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);">Gênero Mais Popular</div>
+      </div>
+    </div>
+    <div style="margin-top:1rem;background:var(--bg-card);border-radius:var(--radius-sm);padding:1rem;border:1px solid var(--border-color);">
+      <div style="font-weight:600;margin-bottom:0.3rem;font-size:0.9rem;">Beats Mais Ouvidos</div>
+      <div id="topBeats"></div>
+    </div>
+    <div class="modal-actions"><button type="button" class="btn-cancel" id="dashboardCancel">Fechar</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="profileModal">
+  <div class="modal" style="max-width: 500px;">
+    <h2><i class="fas fa-user"></i> Perfil do Produtor</h2>
+    <form id="profileForm">
+      <label for="profName">Nome</label>
+      <input type="text" id="profName" placeholder="Seu nome">
+      <label for="profBio">Biografia</label>
+      <textarea id="profBio" placeholder="Conte um pouco sobre você..."></textarea>
+      <label for="profSocial">Instagram</label>
+      <input type="text" id="profSocial" placeholder="@seuinstagram">
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" id="profileCancel">Fechar</button>
+        <button type="submit" class="btn-save">Salvar Perfil</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="aboutModal">
+  <div class="modal" style="max-width: 500px;">
+    <h2><i class="fas fa-info-circle"></i> Sobre</h2>
+    <div style="color:var(--text-secondary);line-height:1.8;font-size:0.9rem;">
+      <p><strong style="color:var(--gold);">Beats Ao</strong> é uma plataforma dedicada a cantores, produtores musicais e artistas que buscam beats exclusivos e de alta qualidade para impulsionar suas carreiras e projetos musicais.</p>
+      <p style="margin-top:0.8rem;">Nossa missão é conectar criadores a instrumentais únicos, oferecendo uma experiência simples, rápida e segura para adquirir beats prontos para uso profissional.</p>
+      <p style="margin-top:0.8rem;">Compre beats exclusivos diretamente via WhatsApp e impulsione sua carreira musical com sons que vão destacar seu trabalho.</p>
+      <hr style="border-color:var(--border-color);margin:0.8rem 0;">
+      <p><i class="fas fa-envelope" style="color:var(--gold);width:20px;"></i> agtbeatsxpalha@email.com</p>
+      <p><i class="fas fa-phone" style="color:var(--gold);width:20px;"></i> +244 926 261 011</p>
+      <p><i class="fas fa-map-marker-alt" style="color:var(--gold);width:20px;"></i> Luanda, Angola</p>
+      <div style="margin-top:0.8rem;display:flex;gap:1rem;justify-content:center;">
+        <button class="social-link" onclick="window.open('https://www.youtube.com/channel/UCZHpXbGkLKXgQxMROaWzR5w','_blank')"><i class="fab fa-youtube"></i></button>
+        <button class="social-link" onclick="window.open('https://www.instagram.com/agostinhoagt/','_blank')"><i class="fab fa-instagram"></i></button>
+        <button class="social-link" onclick="window.open('https://www.facebook.com/profile.php?id=100080875782151','_blank')"><i class="fab fa-facebook-f"></i></button>
+        <button class="social-link" onclick="window.open('https://wa.me/244926261011','_blank')"><i class="fab fa-whatsapp"></i></button>
+      </div>
+    </div>
+    <div class="modal-actions"><button type="button" class="btn-cancel" id="aboutCancel">Fechar</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="ratingModal">
+  <div class="modal" style="max-width: 380px;">
+    <h2><i class="fas fa-star"></i> Avaliar Beat</h2>
+    <p style="color:var(--text-secondary);margin-bottom:0.8rem;font-size:0.9rem;">Como você avalia este beat?</p>
+    <div style="display:flex;gap:0.4rem;font-size:1.8rem;justify-content:center;margin-bottom:1.2rem;" id="ratingStars">
+      <span data-value="1" style="cursor:pointer;color:var(--text-muted);transition:0.2s;">★</span>
+      <span data-value="2" style="cursor:pointer;color:var(--text-muted);transition:0.2s;">★</span>
+      <span data-value="3" style="cursor:pointer;color:var(--text-muted);transition:0.2s;">★</span>
+      <span data-value="4" style="cursor:pointer;color:var(--text-muted);transition:0.2s;">★</span>
+      <span data-value="5" style="cursor:pointer;color:var(--text-muted);transition:0.2s;">★</span>
+    </div>
+    <input type="hidden" id="ratingBeatId" value="">
+    <input type="hidden" id="ratingValue" value="0">
+    <div class="modal-actions">
+      <button type="button" class="btn-cancel" id="ratingCancel">Cancelar</button>
+      <button type="button" class="btn-save" id="ratingSubmit">Enviar Avaliação</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SENHA (DOWNLOAD) -->
+<div class="modal-overlay" id="passwordModal">
+  <div class="modal" style="max-width: 400px;">
+    <h2><i class="fas fa-lock"></i> Download Protegido</h2>
+    <p style="color:var(--text-secondary);margin-bottom:1rem;">Digite a senha para liberar o download</p>
+    <div class="input-group" style="position:relative;margin-bottom:1rem;">
+      <i class="fas fa-key" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--text-muted);"></i>
+      <input type="password" id="passwordInput" placeholder="Digite a senha" style="width:100%;padding:0.7rem 1rem 0.7rem 48px;border-radius:30px;border:1px solid var(--border-color);background:rgba(255,255,255,0.04);color:var(--text-primary);font-size:1rem;outline:none;">
+    </div>
+    <div class="error-msg" id="errorMsg" style="color:#ef4444;font-size:0.8rem;text-align:center;min-height:20px;display:none;">Senha incorreta</div>
+    <div class="modal-actions">
+      <button type="button" class="btn-cancel" id="modalCancel">Cancelar</button>
+      <button type="button" class="btn-save" id="modalConfirm">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT - COMPLETO E CORRIGIDO (COM SUPABASE EDGE FUNCTION)
+     ============================================================ -->
+<script>
+  (function() {
+
+    // ============================================================
+    // API URL - SUPABASE EDGE FUNCTION
+    // ============================================================
+    const API_URL = 'https://bbghffltmiqcljuokbgz.supabase.co/functions/v1/api';
+
+    // ============================================================
+    // 1. ESTADO GLOBAL
+    // ============================================================
+    let beatsData = [];
+    let filteredBeats = [];
+    let editMode = false;
+    let editingId = null;
+    let isLoggedIn = false;
+    let currentUser = null;
+    let selectedCoverFile = null;
+    let playlistAudio = null;
+    let playlistAudioId = null;
+    let currentBeatId = null;
+    let selectedFormat = null;
+    
+    let cart = JSON.parse(localStorage.getItem('bestBeatsCart') || '[]');
+    let userRatings = {};
+    let emailVisible = true;
+    let emailText = '';
+
+    // ============================================================
+    // 2. TOAST
+    // ============================================================
+    function showToast(title, message, type = 'info', duration = 4000) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+      toast.innerHTML = `
+        <div class="toast-icon ${type}"><i class="fas ${icons[type] || icons.info}"></i></div>
+        <div class="toast-content"><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div>
+        <button class="toast-close"><i class="fas fa-times"></i></button>
+      `;
+      container.appendChild(toast);
+      const closeBtn = toast.querySelector('.toast-close');
+      closeBtn.addEventListener('click', () => removeToast(toast));
+      if (duration > 0) setTimeout(() => removeToast(toast), duration);
+      return toast;
+    }
+
+    function removeToast(toast) {
+      if (toast.classList.contains('removing')) return;
+      toast.classList.add('removing');
+      setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 350);
+    }
+
+    // ============================================================
+    // 3. EMAIL TOGGLE
+    // ============================================================
+    function toggleEmailVisibility() {
+      emailVisible = !emailVisible;
+      const emailElement = document.getElementById('emailText');
+      const eyeIcon = document.getElementById('emailEyeIcon');
+      const userEmail = currentUser?.email || 'usuario@email.com';
+      
+      if (emailVisible) {
+        emailElement.textContent = emailText || userEmail;
+        eyeIcon.className = 'fas fa-eye';
+        localStorage.setItem('bestBeatsEmailVisible', 'true');
+        showToast('Email visível', 'O email está visível.', 'info', 2000);
+      } else {
+        const hiddenText = userEmail.replace(/[^@]/g, '•');
+        emailElement.textContent = hiddenText;
+        eyeIcon.className = 'fas fa-eye-slash';
+        localStorage.setItem('bestBeatsEmailVisible', 'false');
+        showToast('Email oculto', 'O email foi ocultado.', 'info', 2000);
+      }
+    }
+
+    function loadEmailVisibility() {
+      const saved = localStorage.getItem('bestBeatsEmailVisible');
+      const userEmail = currentUser?.email || 'usuario@email.com';
+      const emailElement = document.getElementById('emailText');
+      const eyeIcon = document.getElementById('emailEyeIcon');
+      emailText = userEmail;
+      if (saved === 'false') {
+        emailVisible = false;
+        emailElement.textContent = userEmail.replace(/[^@]/g, '•');
+        eyeIcon.className = 'fas fa-eye-slash';
+      } else {
+        emailVisible = true;
+        emailElement.textContent = userEmail;
+        eyeIcon.className = 'fas fa-eye';
+      }
+    }
+
+    // ============================================================
+    // 4. PLAYLIST
+    // ============================================================
+    function getPlaylist() {
+      try { return JSON.parse(localStorage.getItem('favoriteBeats') || '[]'); } catch { return []; }
+    }
+
+    function savePlaylist(ids) {
+      localStorage.setItem('favoriteBeats', JSON.stringify(ids));
+      updatePlaylistCount();
+    }
+
+    function togglePlaylist(beatId) {
+      let playlist = getPlaylist();
+      const index = playlist.indexOf(beatId);
+      if (index > -1) { playlist.splice(index, 1); savePlaylist(playlist); return false; }
+      else { playlist.push(beatId); savePlaylist(playlist); return true; }
+    }
+
+    function isInPlaylist(beatId) { return getPlaylist().includes(beatId); }
+
+    function updatePlaylistCount() {
+      const count = getPlaylist().length;
+      const el = document.getElementById('playlistCount');
+      if (el) el.textContent = count;
+    }
+
+    // ============================================================
+    // 5. CART
+    // ============================================================
+    function updateCart() {
+      localStorage.setItem('bestBeatsCart', JSON.stringify(cart));
+      document.getElementById('cartCount').textContent = cart.length;
+    }
+
+    function toggleCart(beatId) {
+      const index = cart.indexOf(beatId);
+      if (index > -1) { cart.splice(index, 1); updateCart(); return false; }
+      else { cart.push(beatId); updateCart(); return true; }
+    }
+
+    function getCartBeats() {
+      return beatsData.filter(b => cart.includes(b.id));
+    }
+
+    function getCartTotal() {
+      return getCartBeats().reduce((sum, b) => {
+        const price = parseFloat(b.price.replace(/[^0-9.]/g, ''));
+        return sum + (isNaN(price) ? 0 : price);
+      }, 0);
+    }
+
+    // ============================================================
+    // 6. RATING
+    // ============================================================
+    async function loadRatings() {
+      try {
+        const response = await fetch(`${API_URL}/ratings`);
+        if (!response.ok) throw new Error('Erro ao buscar avaliações');
+        const data = await response.json();
+        userRatings = {};
+        if (data && data.length > 0) {
+          data.forEach(r => {
+            if (!userRatings[r.beat_id]) userRatings[r.beat_id] = [];
+            userRatings[r.beat_id].push(r.rating);
+          });
+        }
+      } catch (error) {
+        console.warn('Erro ao carregar avaliações:', error);
+        userRatings = {};
+      }
+    }
+
+    async function rateBeat(beatId, rating) {
+      try {
+        const response = await fetch(`${API_URL}/rate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            beatId: beatId,
+            rating: rating,
+            userId: currentUser?.id || 'anonymous'
+          })
+        });
+        if (!response.ok) throw new Error('Erro ao enviar avaliação');
+        await loadRatings();
+        renderBeats();
+        showToast('Avaliação enviada', 'Obrigado pela sua avaliação!', 'success');
+      } catch (error) {
+        console.error('Erro ao salvar avaliação:', error);
+        showToast('Erro', 'Não foi possível salvar sua avaliação.', 'error');
+      }
+    }
+
+    function getBeatAverageRating(beatId) {
+      const ratings = userRatings[beatId] || [];
+      if (ratings.length === 0) return 0;
+      const sum = ratings.reduce((a, b) => a + b, 0);
+      return sum / ratings.length;
+    }
+
+    function getBeatRatingCount(beatId) {
+      return (userRatings[beatId] || []).length;
+    }
+
+    // ============================================================
+    // 7. SHARE
+    // ============================================================
+    function showShareToast(message) {
+      const toast = document.getElementById('shareToast');
+      toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 3000);
+    }
+
+    function shareBeat(beat) {
+      const baseUrl = window.location.origin + window.location.pathname;
+      const slug = beat.slug || beat.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const shareUrl = `${baseUrl}?beat=${slug}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareUrl).then(() => showShareToast('Link do beat copiado'))
+          .catch(() => fallbackCopy(shareUrl));
+      } else { fallbackCopy(shareUrl); }
+    }
+
+    function fallbackCopy(text) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try { document.execCommand('copy'); showShareToast('Link do beat copiado'); }
+      catch (err) { showShareToast('Copie o link manualmente'); }
+      document.body.removeChild(textArea);
+    }
+
+    // ============================================================
+    // 8. THEME
+    // ============================================================
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('bestBeatsTheme', next);
+      document.getElementById('themeToggle').innerHTML = next === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+    }
+
+    function loadTheme() {
+      const saved = localStorage.getItem('bestBeatsTheme') || 'dark';
+      document.documentElement.setAttribute('data-theme', saved);
+      document.getElementById('themeToggle').innerHTML = saved === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+    }
+
+    // ============================================================
+    // 9. PLAYS
+    // ============================================================
+    async function incrementPlays(beatId) {
+      try {
+        const response = await fetch(`${API_URL}/play`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ beatId: beatId })
+        });
+        if (!response.ok) throw new Error('Erro ao atualizar plays');
+        const data = await response.json();
+        const newPlays = data.plays;
+        
+        const beat = beatsData.find(b => b.id === beatId);
+        if (beat) beat.plays = newPlays;
+        updateBeatPlaysDisplay(beatId, newPlays);
+      } catch (error) {
+        console.error('Erro ao incrementar plays:', error);
+      }
+    }
+
+    function updateBeatPlaysDisplay(beatId, newPlays) {
+      const cards = document.querySelectorAll('.beat-card');
+      cards.forEach(card => {
+        if (parseInt(card.dataset.id) === beatId) {
+          const stats = card.querySelector('.beat-stats');
+          if (stats) {
+            const playSpan = stats.querySelector('.beat-plays');
+            if (playSpan) {
+              playSpan.innerHTML = `<i class="fas fa-headphones"></i> ${newPlays} plays`;
+              playSpan.classList.add('highlight');
+              setTimeout(() => playSpan.classList.remove('highlight'), 800);
+            }
+          }
+        }
+      });
+    }
+
+    // ============================================================
+    // 10. LOAD BEATS
+    // ============================================================
+    async function loadBeats() {
+      try {
+        document.getElementById('loading').style.display = 'flex';
+        document.getElementById('beatsContainer').innerHTML = '';
+        
+        const response = await fetch(`${API_URL}/beats`);
+        if (!response.ok) throw new Error('Erro ao buscar beats');
+        const data = await response.json();
+        beatsData = data || [];
+        
+        await loadRatings();
+        
+        const genres = [...new Set(beatsData.map(b => b.genre).filter(Boolean))];
+        const filterSelect = document.getElementById('filterGenre');
+        const currentVal = filterSelect.value;
+        filterSelect.innerHTML = '<option value="all">Todos os gêneros</option>';
+        genres.forEach(g => {
+          const opt = document.createElement('option');
+          opt.value = g;
+          opt.textContent = g;
+          filterSelect.appendChild(opt);
+        });
+        filterSelect.value = currentVal;
+        
+        applyFilters();
+        updatePlaylistCount();
+        updateCart();
+      } catch (error) {
+        console.error('Erro ao carregar beats:', error);
+        showToast('Erro ao carregar', 'Não foi possível carregar os beats.', 'error');
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+
+    // ============================================================
+    // 11. FILTERS
+    // ============================================================
+    function applyFilters() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const genre = document.getElementById('filterGenre').value;
+      const sort = document.getElementById('sortBy').value;
+
+      filteredBeats = beatsData.filter(b => {
+        const matchSearch = b.title.toLowerCase().includes(search) || b.artist.toLowerCase().includes(search);
+        const matchGenre = genre === 'all' || b.genre === genre;
+        return matchSearch && matchGenre;
+      });
+
+      switch(sort) {
+        case 'recent': filteredBeats.sort((a, b) => b.id - a.id); break;
+        case 'popular': filteredBeats.sort((a, b) => (b.plays || 0) - (a.plays || 0)); break;
+        case 'price-low': filteredBeats.sort((a, b) => parseFloat(a.price.replace(/[^0-9.]/g, '')) - parseFloat(b.price.replace(/[^0-9.]/g, ''))); break;
+        case 'price-high': filteredBeats.sort((a, b) => parseFloat(b.price.replace(/[^0-9.]/g, '')) - parseFloat(a.price.replace(/[^0-9.]/g, ''))); break;
+        case 'rating': filteredBeats.sort((a, b) => getBeatAverageRating(b.id) - getBeatAverageRating(a.id)); break;
+      }
+
+      renderBeats();
+    }
+
+    // ============================================================
+    // 12. RENDER
+    // ============================================================
+    function renderBeats() {
+      const container = document.getElementById('beatsContainer');
+      const list = filteredBeats.length > 0 ? filteredBeats : beatsData;
+      
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center;padding:3rem 0;color:var(--text-muted);">
+            <i class="fas fa-search" style="font-size:2.5rem;display:block;opacity:0.3;margin-bottom:0.8rem;"></i>
+            <p style="font-size:1.1rem;font-weight:300;">Nenhum beat encontrado</p>
+            <p style="font-size:0.85rem;">Tente ajustar sua busca ou filtros</p>
+          </div>
+        `;
+        updateUI();
+        return;
+      }
+
+      container.innerHTML = '';
+      list.forEach(beat => {
+        const card = createBeatCard(beat);
+        container.appendChild(card);
+      });
+      updateUI();
+    }
+
+    // ============================================================
+    // 13. CREATE BEAT CARD
+    // ============================================================
+    function createBeatCard(beat) {
+      const card = document.createElement('div');
+      card.className = 'beat-card';
+      card.dataset.id = beat.id;
+
+      if ((beat.plays || 0) > 3) {
+        const badge = document.createElement('div');
+        badge.className = 'popularity-badge';
+        badge.innerHTML = '<i class="fas fa-fire"></i> Popular';
+        card.appendChild(badge);
+      }
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'card-edit-btn';
+      if (isLoggedIn) editBtn.classList.add('visible');
+      editBtn.innerHTML = '<i class="fas fa-pen"></i>';
+      editBtn.addEventListener('click', (e) => { e.stopPropagation(); if (isLoggedIn) openEditModal(beat.id); });
+      card.appendChild(editBtn);
+
+      if (isLoggedIn) {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'card-edit-btn';
+        deleteBtn.style.right = '52px';
+        deleteBtn.style.color = '#ff6b6b';
+        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+        deleteBtn.addEventListener('click', (e) => { e.stopPropagation(); deleteBeat(beat.id); });
+        card.appendChild(deleteBtn);
+      }
+
+      // PLAYER
+      const playerWrapper = document.createElement('div');
+      playerWrapper.className = 'player-wrapper';
+      
+      const bgImg = document.createElement('img');
+      bgImg.className = 'player-bg';
+      bgImg.src = beat.cover || 'https://picsum.photos/seed/default/400/400';
+      bgImg.alt = `${beat.title} cover`;
+      bgImg.loading = 'lazy';
+      
+      const overlay = document.createElement('div');
+      overlay.className = 'player-overlay';
+      
+      const artistSpan = document.createElement('div');
+      artistSpan.className = 'player-artist';
+      artistSpan.textContent = beat.artist;
+      
+      const titleSpan = document.createElement('div');
+      titleSpan.className = 'player-title';
+      titleSpan.textContent = beat.title;
+      
+      const controls = document.createElement('div');
+      controls.className = 'player-controls';
+      
+      const playBtn = document.createElement('button');
+      playBtn.className = 'btn-play';
+      playBtn.innerHTML = '<i class="fas fa-play"></i>';
+      
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'btn-next';
+      nextBtn.innerHTML = '<i class="fas fa-forward"></i>';
+      
+      const playlistBtn = document.createElement('button');
+      playlistBtn.className = 'btn-playlist';
+      if (isInPlaylist(beat.id)) { 
+        playlistBtn.innerHTML = '<i class="fas fa-check"></i> Added'; 
+        playlistBtn.classList.add('added'); 
+      } else { 
+        playlistBtn.innerHTML = '<i class="fas fa-plus"></i> Add'; 
+      }
+      playlistBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const added = togglePlaylist(beat.id);
+        if (added) { 
+          showToast('Adicionado', `${beat.title} foi adicionado à sua playlist.`, 'success');
+          playlistBtn.innerHTML = '<i class="fas fa-check"></i> Added'; 
+          playlistBtn.classList.add('added'); 
+        } else { 
+          showToast('Removido', `${beat.title} foi removido da sua playlist.`, 'info');
+          playlistBtn.innerHTML = '<i class="fas fa-plus"></i> Add'; 
+          playlistBtn.classList.remove('added'); 
+        }
+        updatePlaylistCount();
+      });
+      
+      controls.appendChild(playBtn);
+      controls.appendChild(nextBtn);
+      controls.appendChild(playlistBtn);
+      
+      const progressArea = document.createElement('div');
+      progressArea.className = 'progress-area';
+      const progress = document.createElement('input');
+      progress.type = 'range';
+      progress.className = 'progress-bar';
+      progress.min = 0; progress.max = 100; progress.value = 0;
+      const timeDisplay = document.createElement('span');
+      timeDisplay.className = 'time-display';
+      timeDisplay.textContent = '0:00';
+      progressArea.appendChild(progress);
+      progressArea.appendChild(timeDisplay);
+      
+      const volumeWrap = document.createElement('div');
+      volumeWrap.className = 'volume-wrap';
+      const volIcon = document.createElement('i');
+      volIcon.className = 'fas fa-volume-low';
+      const volSlider = document.createElement('input');
+      volSlider.type = 'range';
+      volSlider.className = 'volume-slider';
+      volSlider.min = 0; volSlider.max = 100; volSlider.value = 70;
+      volumeWrap.appendChild(volIcon);
+      volumeWrap.appendChild(volSlider);
+      
+      const genreBadge = document.createElement('span');
+      genreBadge.className = 'badge-genre';
+      genreBadge.textContent = beat.genre;
+      
+      overlay.appendChild(artistSpan);
+      overlay.appendChild(titleSpan);
+      overlay.appendChild(controls);
+      overlay.appendChild(progressArea);
+      overlay.appendChild(volumeWrap);
+      overlay.appendChild(genreBadge);
+      
+      playerWrapper.appendChild(bgImg);
+      playerWrapper.appendChild(overlay);
+
+      // INFO
+      const infoDiv = document.createElement('div');
+      infoDiv.className = 'beat-info';
+      
+      const titleInfo = document.createElement('div');
+      titleInfo.className = 'beat-title';
+      titleInfo.innerHTML = `${beat.title} <i class="fas fa-wave-square"></i>`;
+      
+      const metaDiv = document.createElement('div');
+      metaDiv.className = 'beat-meta';
+      const genreSpan = document.createElement('span');
+      genreSpan.className = 'beat-genre';
+      genreSpan.innerHTML = `<i class="fas fa-tag"></i> ${beat.genre}`;
+      const priceSpan = document.createElement('span');
+      priceSpan.className = 'beat-price';
+      priceSpan.innerHTML = `<i class="fas fa-coins"></i> ${beat.price}`;
+      metaDiv.appendChild(genreSpan);
+      metaDiv.appendChild(priceSpan);
+      
+      const exclusivo = document.createElement('div');
+      exclusivo.className = 'beat-exclusivo';
+      exclusivo.innerHTML = `<i class="fas fa-certificate"></i> exclusivo · apenas aqui`;
+      
+      const avgRating = getBeatAverageRating(beat.id);
+      const ratingCount = getBeatRatingCount(beat.id);
+      const starsFull = Math.round(avgRating);
+      const starsEmpty = 5 - starsFull;
+      
+      const statsDiv = document.createElement('div');
+      statsDiv.className = 'beat-stats';
+      statsDiv.innerHTML = `
+        <span class="beat-plays"><i class="fas fa-headphones"></i> ${beat.plays || 0} plays</span>
+        <span class="beat-rating">
+          <i class="fas fa-star"></i> 
+          <span class="stars">${'★'.repeat(starsFull)}${'☆'.repeat(starsEmpty)}</span>
+          <span style="font-size:0.6rem;color:var(--text-muted);">${avgRating ? avgRating.toFixed(1) : '0.0'} (${ratingCount})</span>
+        </span>
+        ${beat.bpm ? `<span><i class="fas fa-waveform"></i> ${beat.bpm} BPM</span>` : ''}
+        ${beat.key ? `<span><i class="fas fa-music"></i> ${beat.key}</span>` : ''}
+      `;
+      
+      // DOWNLOAD BOTÕES
+      const downloadDiv = document.createElement('div');
+      downloadDiv.className = 'download-buttons';
+      
+      const mp3Btn = document.createElement('button');
+      mp3Btn.className = 'btn-download btn-mp3';
+      mp3Btn.innerHTML = '<i class="fas fa-file-audio"></i> MP3';
+      mp3Btn.dataset.format = 'mp3';
+      mp3Btn.dataset.beatId = beat.id;
+      
+      const wavBtn = document.createElement('button');
+      wavBtn.className = 'btn-download btn-wav';
+      wavBtn.innerHTML = '<i class="fas fa-file-audio"></i> WAV';
+      wavBtn.dataset.format = 'wav';
+      wavBtn.dataset.beatId = beat.id;
+      
+      downloadDiv.appendChild(mp3Btn);
+      downloadDiv.appendChild(wavBtn);
+      
+      // AÇÕES
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'beat-actions';
+      
+      const shareBtn = document.createElement('button');
+      shareBtn.className = 'btn-share';
+      shareBtn.innerHTML = '<i class="fas fa-share-alt"></i> Compartilhar';
+      shareBtn.addEventListener('click', (e) => { e.preventDefault(); shareBeat(beat); });
+      
+      const rateBtn = document.createElement('button');
+      rateBtn.className = 'btn-share';
+      rateBtn.innerHTML = '<i class="fas fa-star"></i> Avaliar';
+      rateBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('ratingBeatId').value = beat.id;
+        document.getElementById('ratingValue').value = 0;
+        document.querySelectorAll('#ratingStars span').forEach(s => {
+          s.style.color = 'var(--text-muted)';
+        });
+        document.getElementById('ratingModal').classList.add('active');
+      });
+      
+      const cartBtn = document.createElement('button');
+      cartBtn.className = 'btn-cart';
+      if (cart.includes(beat.id)) { 
+        cartBtn.classList.add('in-cart'); 
+        cartBtn.innerHTML = '<i class="fas fa-check"></i> No Carrinho'; 
+      } else { 
+        cartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Comprar'; 
+      }
+      cartBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const added = toggleCart(beat.id);
+        if (added) { 
+          cartBtn.classList.add('in-cart'); 
+          cartBtn.innerHTML = '<i class="fas fa-check"></i> No Carrinho'; 
+          showToast('Adicionado', `${beat.title} foi adicionado ao carrinho.`, 'success'); 
+        } else { 
+          cartBtn.classList.remove('in-cart'); 
+          cartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Comprar'; 
+          showToast('Removido', `${beat.title} foi removido do carrinho.`, 'info'); 
+        }
+        updateCart();
+      });
+      
+      const negociarBtn = document.createElement('a');
+      negociarBtn.className = 'btn-negociar';
+      negociarBtn.href = '#';
+      negociarBtn.innerHTML = `<i class="fab fa-whatsapp"></i> Negociar`;
+      negociarBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const msg = encodeURIComponent(`Olá! Gostaria de negociar o beat "${beat.title}" de ${beat.artist}.`);
+        window.open(`https://wa.me/244926261011?text=${msg}`, '_blank');
+      });
+      
+      actionsDiv.appendChild(shareBtn);
+      actionsDiv.appendChild(rateBtn);
+      actionsDiv.appendChild(cartBtn);
+      actionsDiv.appendChild(negociarBtn);
+      
+      infoDiv.appendChild(titleInfo);
+      infoDiv.appendChild(metaDiv);
+      infoDiv.appendChild(exclusivo);
+      infoDiv.appendChild(statsDiv);
+      infoDiv.appendChild(downloadDiv);
+      infoDiv.appendChild(actionsDiv);
+      
+      card.appendChild(playerWrapper);
+      card.appendChild(infoDiv);
+
+      // ============================================================
+      // ÁUDIO
+      // ============================================================
+      let audio = null;
+      let isPlaying = false;
+
+      playBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (!beat.audio) { 
+          showToast('Áudio indisponível', 'Este beat não possui um arquivo de áudio.', 'error'); 
+          return; 
+        }
+        
+        if (!audio) {
+          audio = new Audio(beat.audio);
+          audio.volume = 0.7;
+          
+          audio.addEventListener('timeupdate', () => {
+            if (audio.duration) {
+              const percent = (audio.currentTime / audio.duration) * 100;
+              progress.value = percent;
+              const mins = Math.floor(audio.currentTime / 60);
+              const secs = Math.floor(audio.currentTime % 60);
+              timeDisplay.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            }
+          });
+          
+          audio.addEventListener('ended', () => {
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            isPlaying = false;
+            progress.value = 0;
+            timeDisplay.textContent = '0:00';
+          });
+        }
+        
+        if (isPlaying) { 
+          audio.pause(); 
+          playBtn.innerHTML = '<i class="fas fa-play"></i>'; 
+          isPlaying = false;
+        } else { 
+          audio.play().catch(() => {});
+          playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+          isPlaying = true;
+          incrementPlays(beat.id);
+        }
+      });
+
+      nextBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!beat.audio) return;
+        if (!audio) {
+          audio = new Audio(beat.audio);
+          audio.volume = 0.7;
+        }
+        audio.currentTime = 0;
+        if (!isPlaying) { 
+          audio.play().catch(() => {}); 
+          playBtn.innerHTML = '<i class="fas fa-pause"></i>'; 
+          isPlaying = true; 
+        }
+      });
+
+      progress.addEventListener('input', function() { 
+        if (audio && audio.duration) {
+          audio.currentTime = (progress.value / 100) * audio.duration; 
+        }
+      });
+
+      volSlider.addEventListener('input', function() {
+        if (audio) {
+          audio.volume = volSlider.value / 100;
+          volIcon.className = audio.volume === 0 ? 'fas fa-volume-mute' : 'fas fa-volume-low';
+        }
+      });
+
+      // DOWNLOAD
+      mp3Btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openPasswordModal(beat.id, 'mp3');
+      });
+
+      wavBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openPasswordModal(beat.id, 'wav');
+      });
+
+      return card;
+    }
+
+    // ============================================================
+    // 14. MODAL DE SENHA
+    // ============================================================
+    function openPasswordModal(beatId, format) {
+      currentBeatId = beatId;
+      selectedFormat = format;
+      
+      const modal = document.getElementById('passwordModal');
+      const passwordInput = document.getElementById('passwordInput');
+      const errorMsg = document.getElementById('errorMsg');
+      
+      passwordInput.value = '';
+      passwordInput.className = '';
+      errorMsg.style.display = 'none';
+      modal.classList.add('active');
+      setTimeout(() => passwordInput.focus(), 100);
+    }
+
+    document.getElementById('modalConfirm').addEventListener('click', async function() {
+      const passwordInput = document.getElementById('passwordInput');
+      const errorMsg = document.getElementById('errorMsg');
+      const password = passwordInput.value.trim();
+      
+      if (!password) {
+        errorMsg.textContent = 'Digite a senha primeiro';
+        errorMsg.style.display = 'block';
+        passwordInput.className = 'error';
+        setTimeout(() => {
+          passwordInput.className = '';
+          errorMsg.style.display = 'none';
+        }, 2000);
+        return;
+      }
+      
+      try {
+        const beat = beatsData.find(b => b.id === currentBeatId);
+        if (!beat) {
+          errorMsg.textContent = 'Beat não encontrado';
+          errorMsg.style.display = 'block';
+          return;
+        }
+        
+        const slug = beat.slug || beat.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        
+        const response = await fetch(`${API_URL}/download`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            password: password,
+            format: selectedFormat,
+            beatSlug: slug
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          passwordInput.className = 'success';
+          errorMsg.style.display = 'none';
+
+          const link = document.createElement('a');
+          link.href = data.url;
+          link.download = data.filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          setTimeout(() => {
+            document.getElementById('passwordModal').classList.remove('active');
+            passwordInput.className = '';
+          }, 500);
+
+        } else {
+          passwordInput.className = 'error';
+          errorMsg.textContent = data.error || 'Senha incorreta';
+          errorMsg.style.display = 'block';
+          passwordInput.value = '';
+          setTimeout(() => passwordInput.focus(), 100);
+
+          setTimeout(() => {
+            passwordInput.className = '';
+          }, 2000);
+        }
+      } catch (error) {
+        errorMsg.textContent = 'Erro de conexão. Tente novamente.';
+        errorMsg.style.display = 'block';
+        passwordInput.className = 'error';
+        setTimeout(() => {
+          passwordInput.className = '';
+          errorMsg.style.display = 'none';
+        }, 3000);
+      }
+    });
+
+    document.getElementById('modalCancel').addEventListener('click', function() {
+      document.getElementById('passwordModal').classList.remove('active');
+      document.getElementById('passwordInput').className = '';
+      document.getElementById('errorMsg').style.display = 'none';
+    });
+
+    document.getElementById('passwordInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('modalConfirm').click();
+      }
+    });
+
+    document.getElementById('passwordModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.classList.remove('active');
+        document.getElementById('passwordInput').className = '';
+        document.getElementById('errorMsg').style.display = 'none';
+      }
+    });
+
+    // ============================================================
+    // 15. MODALS
+    // ============================================================
+    function openFormModal(beat = null) {
+      if (!isLoggedIn) return;
+      
+      document.getElementById('fCoverFile').value = '';
+      document.getElementById('coverStatus').textContent = 'Selecionar';
+      document.getElementById('previewContainer').innerHTML = '';
+      document.getElementById('fAudioStream').value = '';
+      document.getElementById('fAudioMp3').value = '';
+      document.getElementById('fAudioWav').value = '';
+      document.getElementById('fPassword').value = '';
+      
+      if (beat) {
+        document.getElementById('modalTitle').querySelector('span').textContent = 'Editar Beat';
+        document.getElementById('fTitle').value = beat.title;
+        document.getElementById('fArtist').value = beat.artist;
+        document.getElementById('fGenre').value = beat.genre;
+        document.getElementById('fPrice').value = beat.price;
+        document.getElementById('fBpm').value = beat.bpm || '';
+        document.getElementById('fKey').value = beat.key || '';
+        document.getElementById('fAudioStream').value = beat.audio || '';
+        document.getElementById('fAudioMp3').value = beat.audio_download_mp3 || '';
+        document.getElementById('fAudioWav').value = beat.audio_download_wav || '';
+        document.getElementById('fPassword').value = beat.password || '';
+        editingId = beat.id;
+        if (beat.cover) { 
+          const div = document.createElement('div'); 
+          div.className = 'preview-item'; 
+          div.innerHTML = `<img src="${beat.cover}" alt="capa"> <span>Capa atual</span>`; 
+          document.getElementById('previewContainer').appendChild(div); 
+        }
+      } else {
+        document.getElementById('modalTitle').querySelector('span').textContent = 'Novo Beat';
+        document.getElementById('beatForm').reset();
+        document.getElementById('fBpm').value = '';
+        document.getElementById('fKey').value = '';
+        editingId = null;
+      }
+      document.getElementById('formModal').classList.add('active');
+      document.getElementById('mainDropdown').classList.remove('active');
+    }
+
+    function closeFormModal() {
+      document.getElementById('formModal').classList.remove('active');
+      editingId = null;
+    }
+
+    function openEditModal(id) {
+      const beat = beatsData.find(b => b.id === id);
+      if (beat) openFormModal(beat);
+    }
+
+    // ============================================================
+    // 16. UI UPDATE
+    // ============================================================
+    function updateUI() {
+      if (isLoggedIn && currentUser) {
+        document.getElementById('userInfoDisplay').style.display = 'flex';
+        document.getElementById('userNameDisplay').textContent = currentUser.user_metadata?.name || 'Administrador';
+        document.getElementById('emailText').textContent = currentUser.email || 'usuario@email.com';
+        document.getElementById('avatarContainer').innerHTML = `<img src="eu.jpg" alt="Admin" class="admin-avatar-small">`;
+        document.getElementById('dividerAfterUser').style.display = 'block';
+        document.getElementById('dropdownLogin').style.display = 'none';
+        document.getElementById('dropdownNewBeat').style.display = 'flex';
+        document.getElementById('dropdownToggleEdit').style.display = 'flex';
+        document.getElementById('dropdownDashboard').style.display = 'flex';
+        document.getElementById('dividerBeforeLogout').style.display = 'block';
+        document.getElementById('dropdownLogout').style.display = 'flex';
+        document.getElementById('dropdownToggleEdit').innerHTML = editMode ? '<i class="fas fa-edit"></i> Desativar Edição' : '<i class="fas fa-edit"></i> Editar';
+        document.getElementById('menuLabel').textContent = 'Admin';
+        loadEmailVisibility();
+      } else {
+        document.getElementById('userInfoDisplay').style.display = 'none';
+        document.getElementById('avatarContainer').innerHTML = '';
+        document.getElementById('dividerAfterUser').style.display = 'none';
+        document.getElementById('dropdownLogin').style.display = 'flex';
+        document.getElementById('dropdownNewBeat').style.display = 'none';
+        document.getElementById('dropdownToggleEdit').style.display = 'none';
+        document.getElementById('dropdownDashboard').style.display = 'none';
+        document.getElementById('dividerBeforeLogout').style.display = 'none';
+        document.getElementById('dropdownLogout').style.display = 'none';
+        document.getElementById('menuLabel').textContent = 'Menu';
+      }
+      document.querySelectorAll('.card-edit-btn').forEach(btn => {
+        if (isLoggedIn) btn.classList.add('visible');
+        else btn.classList.remove('visible');
+      });
+      updatePlaylistCount();
+      updateCart();
+    }
+
+    function updatePlaylistButtons(beatId) {
+      document.querySelectorAll('.beat-card').forEach(card => {
+        if (parseInt(card.dataset.id) === beatId) {
+          const btn = card.querySelector('.btn-playlist');
+          if (btn) {
+            if (isInPlaylist(beatId)) {
+              btn.innerHTML = '<i class="fas fa-check"></i> Added';
+              btn.classList.add('added');
+            } else {
+              btn.innerHTML = '<i class="fas fa-plus"></i> Add';
+              btn.classList.remove('added');
+            }
+          }
+        }
+      });
+    }
+
+    // ============================================================
+    // 17. PLAYLIST MODAL
+    // ============================================================
+    function openPlaylistModal() {
+      const container = document.getElementById('playlistContainer');
+      const emptyMsg = document.getElementById('emptyPlaylist');
+      const playlist = getPlaylist();
+      if (playlistAudio) { playlistAudio.pause(); playlistAudio = null; playlistAudioId = null; }
+      if (playlist.length === 0) { container.innerHTML = ''; emptyMsg.style.display = 'block'; }
+      else {
+        emptyMsg.style.display = 'none';
+        container.innerHTML = '';
+        playlist.forEach(id => {
+          const beat = beatsData.find(b => b.id === id);
+          if (beat) {
+            const item = document.createElement('div');
+            item.className = 'playlist-item';
+            item.innerHTML = `
+              <img src="${beat.cover || 'https://picsum.photos/seed/default/100/100'}" alt="${beat.title}" class="cover">
+              <div class="info">
+                <div class="title">${beat.title}</div>
+                <div class="sub">${beat.artist} · ${beat.genre} · ${beat.price}</div>
+              </div>
+              <div class="actions">
+                <button class="btn-play-mini" data-id="${beat.id}" data-audio="${beat.audio || ''}">
+                  <i class="fas fa-play"></i>
+                </button>
+                <div class="progress-mini"><div class="progress-mini-bar" id="playlist-progress-${beat.id}"></div></div>
+                <span class="time-mini" id="playlist-time-${beat.id}">0:00</span>
+                <button class="btn-remove" data-id="${beat.id}"><i class="fas fa-trash"></i> Remover</button>
+              </div>
+            `;
+            const removeBtn = item.querySelector('.btn-remove');
+            removeBtn.addEventListener('click', () => {
+              const newPlaylist = getPlaylist().filter(id => id !== beat.id);
+              savePlaylist(newPlaylist);
+              updatePlaylistButtons(beat.id);
+              showToast('Removido', `${beat.title} foi removido da sua playlist.`, 'info');
+              openPlaylistModal();
+            });
+            const playMiniBtn = item.querySelector('.btn-play-mini');
+            const progressMini = item.querySelector('.progress-mini-bar');
+            const timeMini = document.getElementById(`playlist-time-${beat.id}`);
+            playMiniBtn.addEventListener('click', () => {
+              const audioUrl = playMiniBtn.dataset.audio;
+              if (!audioUrl) { showToast('Áudio indisponível', 'Este beat não possui áudio.', 'error'); return; }
+              if (playlistAudioId === beat.id && playlistAudio && !playlistAudio.paused) {
+                playlistAudio.pause(); playMiniBtn.innerHTML = '<i class="fas fa-play"></i>'; playMiniBtn.classList.remove('playing'); playlistAudioId = null; return;
+              }
+              if (playlistAudio) { playlistAudio.pause(); document.querySelectorAll('.btn-play-mini').forEach(b => { b.innerHTML = '<i class="fas fa-play"></i>'; b.classList.remove('playing'); }); }
+              playlistAudio = new Audio(audioUrl);
+              playlistAudio.volume = 0.7;
+              playlistAudioId = beat.id;
+              playMiniBtn.innerHTML = '<i class="fas fa-pause"></i>';
+              playMiniBtn.classList.add('playing');
+              playlistAudio.play().catch(() => {});
+              playlistAudio.addEventListener('timeupdate', () => {
+                if (playlistAudio.duration) {
+                  const percent = (playlistAudio.currentTime / playlistAudio.duration) * 100;
+                  if (progressMini) progressMini.style.width = percent + '%';
+                  const mins = Math.floor(playlistAudio.currentTime / 60);
+                  const secs = Math.floor(playlistAudio.currentTime % 60);
+                  if (timeMini) timeMini.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                }
+              });
+              playlistAudio.addEventListener('ended', () => {
+                playMiniBtn.innerHTML = '<i class="fas fa-play"></i>';
+                playMiniBtn.classList.remove('playing');
+                if (progressMini) progressMini.style.width = '0%';
+                if (timeMini) timeMini.textContent = '0:00';
+                playlistAudioId = null;
+              });
+            });
+            container.appendChild(item);
+          }
+        });
+      }
+      document.getElementById('playlistModal').classList.add('active');
+      document.getElementById('mainDropdown').classList.remove('active');
+    }
+
+    // ============================================================
+    // 18. CART MODAL
+    // ============================================================
+    function openCartModal() {
+      const container = document.getElementById('cartContainer');
+      const emptyMsg = document.getElementById('emptyCart');
+      const totalDiv = document.getElementById('cartTotal');
+      const cartBeats = getCartBeats();
+      if (cartBeats.length === 0) { container.innerHTML = ''; emptyMsg.style.display = 'block'; totalDiv.style.display = 'none'; }
+      else {
+        emptyMsg.style.display = 'none';
+        totalDiv.style.display = 'block';
+        container.innerHTML = '';
+        cartBeats.forEach(beat => {
+          const item = document.createElement('div');
+          item.className = 'cart-item';
+          item.innerHTML = `
+            <img src="${beat.cover || 'https://picsum.photos/seed/default/50/50'}" style="width:40px;height:40px;border-radius:8px;object-fit:cover;flex-shrink:0;">
+            <div class="info">
+              <div class="title">${beat.title}</div>
+              <div class="sub">${beat.artist} · ${beat.price}</div>
+            </div>
+            <button class="remove-item" data-id="${beat.id}"><i class="fas fa-times"></i></button>
+          `;
+          const removeBtn = item.querySelector('.remove-item');
+          removeBtn.addEventListener('click', () => {
+            cart = cart.filter(id => id !== beat.id);
+            updateCart();
+            openCartModal();
+            updatePlaylistButtons(beat.id);
+          });
+          container.appendChild(item);
+        });
+        document.getElementById('cartTotalValue').textContent = `Kz ${getCartTotal().toFixed(2)}`;
+      }
+      document.getElementById('cartModal').classList.add('active');
+    }
+
+    // ============================================================
+    // 19. DASHBOARD
+    // ============================================================
+    function openDashboard() {
+      const totalBeats = beatsData.length;
+      const totalPlays = beatsData.reduce((sum, b) => sum + (b.plays || 0), 0);
+      let allRatings = [];
+      Object.values(userRatings).forEach(r => { allRatings = allRatings.concat(r); });
+      const avgRating = allRatings.length > 0 ? (allRatings.reduce((a, b) => a + b, 0) / allRatings.length) : 0;
+      const genres = {};
+      beatsData.forEach(b => { genres[b.genre] = (genres[b.genre] || 0) + 1; });
+      const topGenre = Object.keys(genres).sort((a, b) => genres[b] - genres[a])[0] || '-';
+      document.getElementById('totalBeats').textContent = totalBeats;
+      document.getElementById('totalPlays').textContent = totalPlays;
+      document.getElementById('avgRating').textContent = avgRating ? avgRating.toFixed(1) : '0.0';
+      document.getElementById('topGenre').textContent = topGenre;
+      const topBeats = [...beatsData].sort((a, b) => (b.plays || 0) - (a.plays || 0)).slice(0, 5);
+      const topContainer = document.getElementById('topBeats');
+      topContainer.innerHTML = '';
+      topBeats.forEach((b, i) => {
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex;justify-content:space-between;padding:0.2rem 0;border-bottom:1px solid var(--border-color);font-size:0.8rem;';
+        div.innerHTML = `<span>${i+1}. ${b.title}</span><span style="color:var(--gold);">${b.plays || 0} plays</span>`;
+        topContainer.appendChild(div);
+      });
+      document.getElementById('dashboardModal').classList.add('active');
+    }
+
+    // ============================================================
+    // 20. AUTH - FUNÇÕES DESATIVADAS
+    // ============================================================
+    function doLogin(e) {
+      e.preventDefault();
+      showToast('Admin desativado', 'O modo administrador está temporariamente indisponível.', 'error');
+    }
+
+    function doLogout() {
+      showToast('Admin desativado', 'O modo administrador está temporariamente indisponível.', 'error');
+    }
+
+    async function deleteBeat(id) {
+      showToast('Funcionalidade indisponível', 'A exclusão de beats está temporariamente indisponível.', 'error');
+    }
+
+    // ============================================================
+    // 21. EVENTOS
+    // ============================================================
+    document.getElementById('menuBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('mainDropdown').classList.toggle('active');
+    });
+    document.addEventListener('click', () => document.getElementById('mainDropdown').classList.remove('active'));
+    
+    document.getElementById('toggleEmailBtn').addEventListener('click', toggleEmailVisibility);
+    
+    document.getElementById('dropdownLogin').addEventListener('click', () => {
+      document.getElementById('loginModal').classList.add('active');
+      document.getElementById('loginError').style.display = 'none';
+      document.getElementById('mainDropdown').classList.remove('active');
+    });
+    document.getElementById('loginCancel').addEventListener('click', () => document.getElementById('loginModal').classList.remove('active'));
+    document.getElementById('loginForm').addEventListener('submit', doLogin);
+    
+    document.getElementById('dropdownNewBeat').addEventListener('click', () => {
+      showToast('Admin desativado', 'O modo administrador está temporariamente indisponível.', 'error');
+    });
+    document.getElementById('formCancel').addEventListener('click', closeFormModal);
+    
+    document.getElementById('fCoverFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) { document.getElementById('coverStatus').textContent = `📷 ${file.name} (${(file.size/1024).toFixed(1)} KB)`; }
+      else { document.getElementById('coverStatus').textContent = 'Selecionar'; }
+    });
+    
+    document.getElementById('dropdownToggleEdit').addEventListener('click', function() {
+      if (!isLoggedIn) return;
+      editMode = !editMode;
+      this.innerHTML = editMode ? '<i class="fas fa-edit"></i> Desativar Edição' : '<i class="fas fa-edit"></i> Editar';
+      document.querySelectorAll('.card-edit-btn').forEach(btn => {
+        if (editMode && isLoggedIn) btn.style.display = 'flex';
+        else btn.style.display = 'none';
+      });
+      document.getElementById('mainDropdown').classList.remove('active');
+    });
+    
+    document.getElementById('dropdownLogout').addEventListener('click', doLogout);
+    document.getElementById('dropdownPlaylist').addEventListener('click', openPlaylistModal);
+    document.getElementById('playlistCancel').addEventListener('click', () => {
+      if (playlistAudio) { playlistAudio.pause(); playlistAudio = null; playlistAudioId = null; }
+      document.getElementById('playlistModal').classList.remove('active');
+    });
+    
+    document.getElementById('cartBtn').addEventListener('click', openCartModal);
+    document.getElementById('cartCancel').addEventListener('click', () => document.getElementById('cartModal').classList.remove('active'));
+    document.getElementById('cartCheckout').addEventListener('click', () => {
+      const cartBeats = getCartBeats();
+      if (cartBeats.length === 0) { showToast('Carrinho vazio', 'Adicione beats ao carrinho.', 'error'); return; }
+      const msg = encodeURIComponent(`Olá! Gostaria de comprar os seguintes beats:\n${cartBeats.map(b => `- ${b.title} (${b.artist}) - ${b.price}`).join('\n')}\nTotal: Kz ${getCartTotal().toFixed(2)}`);
+      window.open(`https://wa.me/244926261011?text=${msg}`, '_blank');
+      document.getElementById('cartModal').classList.remove('active');
+    });
+    
+    document.getElementById('dropdownDashboard').addEventListener('click', openDashboard);
+    document.getElementById('dashboardCancel').addEventListener('click', () => document.getElementById('dashboardModal').classList.remove('active'));
+    
+    document.getElementById('dropdownProfile').addEventListener('click', () => {
+      const saved = JSON.parse(localStorage.getItem('bestBeatsProfile') || '{"name":"","bio":"","social":""}');
+      document.getElementById('profName').value = saved.name || '';
+      document.getElementById('profBio').value = saved.bio || '';
+      document.getElementById('profSocial').value = saved.social || '';
+      document.getElementById('profileModal').classList.add('active');
+      document.getElementById('mainDropdown').classList.remove('active');
+    });
+    document.getElementById('profileCancel').addEventListener('click', () => document.getElementById('profileModal').classList.remove('active'));
+    document.getElementById('profileForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const profile = {
+        name: document.getElementById('profName').value.trim(),
+        bio: document.getElementById('profBio').value.trim(),
+        social: document.getElementById('profSocial').value.trim()
+      };
+      localStorage.setItem('bestBeatsProfile', JSON.stringify(profile));
+      showToast('Perfil salvo', 'Suas informações foram atualizadas.', 'success');
+      document.getElementById('profileModal').classList.remove('active');
+    });
+    
+    document.getElementById('dropdownAbout').addEventListener('click', () => {
+      document.getElementById('aboutModal').classList.add('active');
+      document.getElementById('mainDropdown').classList.remove('active');
+    });
+    document.getElementById('aboutCancel').addEventListener('click', () => document.getElementById('aboutModal').classList.remove('active'));
+    
+    document.getElementById('ratingCancel').addEventListener('click', () => document.getElementById('ratingModal').classList.remove('active'));
+    document.getElementById('ratingSubmit').addEventListener('click', async () => {
+      const beatId = parseInt(document.getElementById('ratingBeatId').value);
+      const rating = parseInt(document.getElementById('ratingValue').value);
+      if (rating === 0) { showToast('Avaliação', 'Selecione uma nota de 1 a 5.', 'info'); return; }
+      await rateBeat(beatId, rating);
+      document.getElementById('ratingModal').classList.remove('active');
+    });
+    document.querySelectorAll('#ratingStars span').forEach(star => {
+      star.addEventListener('click', function() {
+        const val = parseInt(this.dataset.value);
+        document.getElementById('ratingValue').value = val;
+        document.querySelectorAll('#ratingStars span').forEach(s => {
+          if (parseInt(s.dataset.value) <= val) s.style.color = 'var(--gold)';
+          else s.style.color = 'var(--text-muted)';
+        });
+      });
+      star.addEventListener('mouseenter', function() {
+        const val = parseInt(this.dataset.value);
+        document.querySelectorAll('#ratingStars span').forEach(s => {
+          if (parseInt(s.dataset.value) <= val) s.style.color = 'var(--gold)';
+          else s.style.color = 'var(--text-muted)';
+        });
+      });
+      star.addEventListener('mouseleave', function() {
+        const current = parseInt(document.getElementById('ratingValue').value) || 0;
+        document.querySelectorAll('#ratingStars span').forEach(s => {
+          if (parseInt(s.dataset.value) <= current) s.style.color = 'var(--gold)';
+          else s.style.color = 'var(--text-muted)';
+        });
+      });
+    });
+    
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('filterGenre').addEventListener('change', applyFilters);
+    document.getElementById('sortBy').addEventListener('change', applyFilters);
+    document.getElementById('clearSearch').addEventListener('click', () => {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('clearSearch').classList.remove('visible');
+      applyFilters();
+    });
+    document.getElementById('searchInput').addEventListener('input', function() {
+      document.getElementById('clearSearch').classList.toggle('visible', this.value.length > 0);
+    });
+    
+    document.getElementById('logoLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.href = window.location.pathname;
+    });
+    
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+    
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+      });
+    });
+
+    // ============================================================
+    // 22. INIT
+    // ============================================================
+    async function init() {
+      loadTheme();
+      isLoggedIn = false;
+      currentUser = null;
+      await loadBeats();
+      updateUI();
+      console.log('Beats Ao v1.0 - Supabase Edge Function');
+      console.log('📱 WhatsApp: +244 926 261 011');
+      console.log('📧 Email: agtbeatsxpalha@email.com');
+      console.log('🔗 API URL:', API_URL);
+    }
+    init();
+
+  })();
+</script>
+</body>
 </html>
