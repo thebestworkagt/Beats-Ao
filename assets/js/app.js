@@ -20,7 +20,6 @@
     let currentBeatId = null;
     let selectedFormat = null;
     
-    let cart = JSON.parse(localStorage.getItem('bestBeatsCart') || '[]');
     let userRatings = {};
 
     // ============================================================
@@ -69,25 +68,27 @@
     // 5. CART
     // ============================================================
     function updateCart() {
-      localStorage.setItem('bestBeatsCart', JSON.stringify(cart));
-      document.getElementById('cartCount').textContent = cart.length;
+      window.BeatsAoCart.updateCount();
     }
 
     function toggleCart(beatId) {
-      const index = cart.indexOf(beatId);
-      if (index > -1) { cart.splice(index, 1); updateCart(); return false; }
-      else { cart.push(beatId); updateCart(); return true; }
+      return window.BeatsAoCart.toggle(beatId);
+    }
+
+    function isInCart(beatId) {
+      return window.BeatsAoCart.includes(beatId);
+    }
+
+    function removeFromCart(beatId) {
+      window.BeatsAoCart.remove(beatId);
     }
 
     function getCartBeats() {
-      return beatsData.filter(b => cart.includes(b.id));
+      return window.BeatsAoCart.getBeats(beatsData);
     }
 
     function getCartTotal() {
-      return getCartBeats().reduce((sum, b) => {
-        const price = parseFloat(b.price.replace(/[^0-9.]/g, ''));
-        return sum + (isNaN(price) ? 0 : price);
-      }, 0);
+      return window.BeatsAoCart.getTotal(beatsData);
     }
 
     // ============================================================
@@ -516,7 +517,7 @@
       
       const cartBtn = document.createElement('button');
       cartBtn.className = 'btn-cart';
-      if (cart.includes(beat.id)) { 
+      if (isInCart(beat.id)) { 
         cartBtn.classList.add('in-cart'); 
         cartBtn.innerHTML = '<i class="fas fa-check"></i> No Carrinho'; 
       } else { 
@@ -983,7 +984,7 @@
           `;
           const removeBtn = item.querySelector('.remove-item');
           removeBtn.addEventListener('click', () => {
-            cart = cart.filter(id => id !== beat.id);
+            removeFromCart(beat.id);
             updateCart();
             openCartModal();
             updatePlaylistButtons(beat.id);
