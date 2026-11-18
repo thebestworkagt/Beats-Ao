@@ -37,6 +37,19 @@ A extração direta de funções para ficheiros separados não é segura: vária
 - Carrinho e avaliações: `cart`, `userRatings`
 - Perfil: `emailVisible`, `emailText`
 
+## Módulos já extraídos
+
+A primeira fase de modularização já foi aplicada no branch de desenvolvimento:
+
+- `assets/js/services/api.js`: serviço HTTP comum para a Edge Function.
+- `assets/js/features/theme.js`: aplicação e alternância do tema.
+- `assets/js/core/notifications.js`: notificações toast e feedback de partilha.
+- `assets/js/features/profile-privacy.js`: visibilidade e ocultação do email do perfil.
+- `assets/js/features/playlist.js`: persistência e operações básicas da playlist.
+- `assets/js/app.js`: ainda mantém catálogo, reprodução, carrinho, avaliações, modais, eventos e inicialização.
+
+Os módulos são carregados antes de `app.js`, através de scripts clássicos com `defer`. A comunicação entre módulos é feita por interfaces explícitas em `window.BeatsAo...`; não foi introduzido bundler nem framework.
+
 ## Estrutura-alvo proposta
 
 A divisão será gradual, mantendo inicialmente o carregamento clássico e sem introduzir ferramentas de build:
