@@ -113,3 +113,10 @@ A inspeção realizada foi estática, através do código no GitHub. Ainda não 
 - Responsabilidade: persistência do carrinho, inclusão/remoção de beats, consulta dos itens, cálculo do total e atualização do contador.
 - API global: `window.BeatsAoCart`.
 - O `app.js` mantém apenas a integração com a interface, catálogo e checkout; não manipula diretamente o estado persistido do carrinho.
+
+
+### Avaliações
+- Arquivo: `assets/js/features/ratings.js`.
+- Responsabilidade: carregar avaliações, enviar novas notas e calcular médias e contagens por beat e no conjunto.
+- API global: `window.BeatsAoRatings`.
+- O `app.js` mantém a integração com os modais, renderização e notificações.
