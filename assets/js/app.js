@@ -22,8 +22,6 @@
     
     let cart = JSON.parse(localStorage.getItem('bestBeatsCart') || '[]');
     let userRatings = {};
-    let emailVisible = true;
-    let emailText = '';
 
     // ============================================================
     // 2. TOAST
@@ -36,40 +34,12 @@
     // 3. EMAIL TOGGLE
     // ============================================================
     function toggleEmailVisibility() {
-      emailVisible = !emailVisible;
-      const emailElement = document.getElementById('emailText');
-      const eyeIcon = document.getElementById('emailEyeIcon');
-      const userEmail = currentUser?.email || 'usuario@email.com';
-      
-      if (emailVisible) {
-        emailElement.textContent = emailText || userEmail;
-        eyeIcon.className = 'fas fa-eye';
-        localStorage.setItem('bestBeatsEmailVisible', 'true');
-        showToast('Email visível', 'O email está visível.', 'info', 2000);
-      } else {
-        const hiddenText = userEmail.replace(/[^@]/g, '•');
-        emailElement.textContent = hiddenText;
-        eyeIcon.className = 'fas fa-eye-slash';
-        localStorage.setItem('bestBeatsEmailVisible', 'false');
-        showToast('Email oculto', 'O email foi ocultado.', 'info', 2000);
-      }
+      window.BeatsAoProfilePrivacy.toggle();
     }
 
     function loadEmailVisibility() {
-      const saved = localStorage.getItem('bestBeatsEmailVisible');
-      const userEmail = currentUser?.email || 'usuario@email.com';
-      const emailElement = document.getElementById('emailText');
-      const eyeIcon = document.getElementById('emailEyeIcon');
-      emailText = userEmail;
-      if (saved === 'false') {
-        emailVisible = false;
-        emailElement.textContent = userEmail.replace(/[^@]/g, '•');
-        eyeIcon.className = 'fas fa-eye-slash';
-      } else {
-        emailVisible = true;
-        emailElement.textContent = userEmail;
-        eyeIcon.className = 'fas fa-eye';
-      }
+      window.BeatsAoProfilePrivacy.setUser(currentUser);
+      window.BeatsAoProfilePrivacy.load();
     }
 
     // ============================================================
