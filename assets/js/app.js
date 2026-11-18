@@ -46,27 +46,23 @@
     // 4. PLAYLIST
     // ============================================================
     function getPlaylist() {
-      try { return JSON.parse(localStorage.getItem('favoriteBeats') || '[]'); } catch { return []; }
+      return window.BeatsAoPlaylist.getAll();
     }
 
     function savePlaylist(ids) {
-      localStorage.setItem('favoriteBeats', JSON.stringify(ids));
-      updatePlaylistCount();
+      window.BeatsAoPlaylist.save(ids);
     }
 
     function togglePlaylist(beatId) {
-      let playlist = getPlaylist();
-      const index = playlist.indexOf(beatId);
-      if (index > -1) { playlist.splice(index, 1); savePlaylist(playlist); return false; }
-      else { playlist.push(beatId); savePlaylist(playlist); return true; }
+      return window.BeatsAoPlaylist.toggle(beatId);
     }
 
-    function isInPlaylist(beatId) { return getPlaylist().includes(beatId); }
+    function isInPlaylist(beatId) {
+      return window.BeatsAoPlaylist.includes(beatId);
+    }
 
     function updatePlaylistCount() {
-      const count = getPlaylist().length;
-      const el = document.getElementById('playlistCount');
-      if (el) el.textContent = count;
+      window.BeatsAoPlaylist.updateCount();
     }
 
     // ============================================================
