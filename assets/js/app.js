@@ -29,26 +29,7 @@
     // 2. TOAST
     // ============================================================
     function showToast(title, message, type = 'info', duration = 4000) {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      toast.className = 'toast';
-      const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
-      toast.innerHTML = `
-        <div class="toast-icon ${type}"><i class="fas ${icons[type] || icons.info}"></i></div>
-        <div class="toast-content"><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div>
-        <button class="toast-close"><i class="fas fa-times"></i></button>
-      `;
-      container.appendChild(toast);
-      const closeBtn = toast.querySelector('.toast-close');
-      closeBtn.addEventListener('click', () => removeToast(toast));
-      if (duration > 0) setTimeout(() => removeToast(toast), duration);
-      return toast;
-    }
-
-    function removeToast(toast) {
-      if (toast.classList.contains('removing')) return;
-      toast.classList.add('removing');
-      setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 350);
+      return window.BeatsAoNotifications.showToast(title, message, type, duration);
     }
 
     // ============================================================
@@ -196,10 +177,7 @@
     // 7. SHARE
     // ============================================================
     function showShareToast(message) {
-      const toast = document.getElementById('shareToast');
-      toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
-      toast.classList.add('visible');
-      setTimeout(() => toast.classList.remove('visible'), 3000);
+      window.BeatsAoNotifications.showShareToast(message);
     }
 
     function shareBeat(beat) {
