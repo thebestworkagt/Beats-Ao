@@ -20,7 +20,6 @@
     let currentBeatId = null;
     let selectedFormat = null;
     
-    let userRatings = {};
 
     // ============================================================
     // 2. TOAST
@@ -95,32 +94,12 @@
     // 6. RATING
     // ============================================================
     async function loadRatings() {
-      try {
-        const response = await BeatsAoApi.get('ratings');
-        if (!response.ok) throw new Error('Erro ao buscar avaliações');
-        const data = await response.json();
-        userRatings = {};
-        if (data && data.length > 0) {
-          data.forEach(r => {
-            if (!userRatings[r.beat_id]) userRatings[r.beat_id] = [];
-            userRatings[r.beat_id].push(r.rating);
-          });
-        }
-      } catch (error) {
-        console.warn('Erro ao carregar avaliações:', error);
-        userRatings = {};
-      }
+      return window.BeatsAoRatings.load(BeatsAoApi);
     }
 
     async function rateBeat(beatId, rating) {
       try {
-        const response = await BeatsAoApi.post('rate', {
-          beatId: beatId,
-          rating: rating,
-          userId: currentUser?.id || 'anonymous'
-        });
-        if (!response.ok) throw new Error('Erro ao enviar avaliação');
-        await loadRatings();
+        await window.BeatsAoRatings.submit(BeatsAoApi, beatId, rating, currentUser?.id || 'anonymous');
         renderBeats();
         showToast('Avaliação enviada', 'Obrigado pela sua avaliação!', 'success');
       } catch (error) {
@@ -130,14 +109,11 @@
     }
 
     function getBeatAverageRating(beatId) {
-      const ratings = userRatings[beatId] || [];
-      if (ratings.length === 0) return 0;
-      const sum = ratings.reduce((a, b) => a + b, 0);
-      return sum / ratings.length;
+      return window.BeatsAoRatings.getAverage(beatId);
     }
 
     function getBeatRatingCount(beatId) {
-      return (userRatings[beatId] || []).length;
+      return window.BeatsAoRatings.getCount(beatId);
     }
 
     // ============================================================
@@ -1002,9 +978,7 @@
     function openDashboard() {
       const totalBeats = beatsData.length;
       const totalPlays = beatsData.reduce((sum, b) => sum + (b.plays || 0), 0);
-      let allRatings = [];
-      Object.values(userRatings).forEach(r => { allRatings = allRatings.concat(r); });
-      const avgRating = allRatings.length > 0 ? (allRatings.reduce((a, b) => a + b, 0) / allRatings.length) : 0;
+      const avgRating = window.BeatsAoRatings.getOverallAverage();
       const genres = {};
       beatsData.forEach(b => { genres[b.genre] = (genres[b.genre] || 0) + 1; });
       const topGenre = Object.keys(genres).sort((a, b) => genres[b] - genres[a])[0] || '-';
