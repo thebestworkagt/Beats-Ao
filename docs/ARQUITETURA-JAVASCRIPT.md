@@ -106,3 +106,10 @@ Esta é uma estrutura-alvo, não uma declaração de que os módulos já existem
 ## Validação pendente
 
 A inspeção realizada foi estática, através do código no GitHub. Ainda não houve teste de browser, execução automatizada, nem chamadas de teste à API. Portanto, não se declara a aplicação funcional apenas com base nesta reorganização.
+
+
+### Carrinho
+- Arquivo: `assets/js/features/cart.js`.
+- Responsabilidade: persistência do carrinho, inclusão/remoção de beats, consulta dos itens, cálculo do total e atualização do contador.
+- API global: `window.BeatsAoCart`.
+- O `app.js` mantém apenas a integração com a interface, catálogo e checkout; não manipula diretamente o estado persistido do carrinho.
