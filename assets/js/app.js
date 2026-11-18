@@ -3,7 +3,7 @@
     // ============================================================
     // API URL - SUPABASE EDGE FUNCTION
     // ============================================================
-    const API_URL = 'https://bbghffltmiqcljuokbgz.supabase.co/functions/v1/api';
+    const API_URL = window.BeatsAoApi.baseUrl;
 
     // ============================================================
     // 1. ESTADO GLOBAL
@@ -148,7 +148,7 @@
     // ============================================================
     async function loadRatings() {
       try {
-        const response = await fetch(`${API_URL}/ratings`);
+        const response = await BeatsAoApi.get('ratings');
         if (!response.ok) throw new Error('Erro ao buscar avaliações');
         const data = await response.json();
         userRatings = {};
@@ -166,14 +166,10 @@
 
     async function rateBeat(beatId, rating) {
       try {
-        const response = await fetch(`${API_URL}/rate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            beatId: beatId,
-            rating: rating,
-            userId: currentUser?.id || 'anonymous'
-          })
+        const response = await BeatsAoApi.post('rate', {
+          beatId: beatId,
+          rating: rating,
+          userId: currentUser?.id || 'anonymous'
         });
         if (!response.ok) throw new Error('Erro ao enviar avaliação');
         await loadRatings();
@@ -251,11 +247,7 @@
     // ============================================================
     async function incrementPlays(beatId) {
       try {
-        const response = await fetch(`${API_URL}/play`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ beatId: beatId })
-        });
+        const response = await BeatsAoApi.post('play', { beatId: beatId });
         if (!response.ok) throw new Error('Erro ao atualizar plays');
         const data = await response.json();
         const newPlays = data.plays;
@@ -293,7 +285,7 @@
         document.getElementById('loading').style.display = 'flex';
         document.getElementById('beatsContainer').innerHTML = '';
         
-        const response = await fetch(`${API_URL}/beats`);
+        const response = await BeatsAoApi.get('beats');
         if (!response.ok) throw new Error('Erro ao buscar beats');
         const data = await response.json();
         beatsData = data || [];
@@ -771,14 +763,10 @@
         
         const slug = beat.slug || beat.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
         
-        const response = await fetch(`${API_URL}/download`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            password: password,
-            format: selectedFormat,
-            beatSlug: slug
-          })
+        const response = await BeatsAoApi.post('download', {
+          password: password,
+          format: selectedFormat,
+          beatSlug: slug
         });
 
         const data = await response.json();
