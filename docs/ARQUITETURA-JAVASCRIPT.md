@@ -1,122 +1,73 @@
-# Arquitetura do JavaScript — Beats Ao
+# Arquitetura JavaScript — Beats Ao
 
-## Estado atual
+## Estado atual da branch
 
-O frontend é carregado por `assets/js/app.js`. O ficheiro contém uma IIFE única, 39 funções e estado lexical partilhado. Não há ainda módulos independentes nem uma camada formal de serviços.
+O frontend usa scripts clássicos com `defer`, sem bundler ou framework. Os módulos comunicam-se por interfaces explícitas em `window.BeatsAo...`. A branch de trabalho é `hardening/admin-foundation`; a branch `main` permanece separada.
 
-A extração direta de funções para ficheiros separados não é segura: várias funções dependem de variáveis e funções declaradas dentro da mesma IIFE. A separação deve preservar essas dependências ou substituí-las deliberadamente por interfaces explícitas.
-
-## Inventário por responsabilidade
-
-| Área | Funções atuais | Dependências principais |
-|---|---|---|
-| Notificações | `showToast`, `removeToast`, `showShareToast` | DOM de toast e share |
-| Perfil / privacidade | `toggleEmailVisibility`, `loadEmailVisibility` | `currentUser`, `emailVisible`, `emailText`, localStorage |
-| Playlist | `getPlaylist`, `savePlaylist`, `togglePlaylist`, `isInPlaylist`, `updatePlaylistCount`, `openPlaylistModal` | `beatsData`, estado do áudio, DOM |
-| Carrinho | `updateCart`, `toggleCart`, `getCartBeats`, `getCartTotal`, `openCartModal` | `cart`, `beatsData`, localStorage |
-| Avaliações | `loadRatings`, `rateBeat`, `getBeatAverageRating`, `getBeatRatingCount` | API, `userRatings`, `renderBeats`, toast |
-| Partilha | `shareBeat`, `fallbackCopy` | Clipboard, DOM, toast |
-| Tema | `toggleTheme`, `loadTheme` | DOM, localStorage |
-| API / catálogo | `loadBeats`, `incrementPlays`, `updateBeatPlaysDisplay` | API, `beatsData`, ratings, filtros |
-| Pesquisa / ordenação | `applyFilters` | `beatsData`, `filteredBeats`, ratings, DOM |
-| Renderização | `renderBeats`, `createBeatCard`, `updateUI`, `updatePlaylistButtons` | Quase todo o estado do catálogo, player, carrinho e modais |
-| Formulário / edição | `openFormModal`, `closeFormModal`, `openEditModal` | `editingId`, `selectedCoverFile`, catálogo e DOM |
-| Download | `openPasswordModal` | Beat selecionado, formato, API e modal |
-| Dashboard | `openDashboard` | Beats, ratings e DOM |
-| Autenticação / administração | `doLogin`, `doLogout`, `deleteBeat` | Estado de sessão e interface; atualmente desativadas |
-| Inicialização | `init` | Tema, catálogo, interface e API |
-| Eventos | bloco de registo de listeners dentro da IIFE | Todas as áreas anteriores |
-
-## Estado partilhado atual
-
-- Catálogo: `beatsData`, `filteredBeats`
-- Administração: `editMode`, `editingId`, `isLoggedIn`, `currentUser`
-- Formulário: `selectedCoverFile`
-- Reprodução: `playlistAudio`, `playlistAudioId`, `currentBeatId`
-- Download: `selectedFormat`
-- Carrinho e avaliações: `cart`, `userRatings`
-- Perfil: `emailVisible`, `emailText`
-
-## Módulos já extraídos
-
-A primeira fase de modularização já foi aplicada no branch de desenvolvimento:
-
-- `assets/js/services/api.js`: serviço HTTP comum para a Edge Function.
-- `assets/js/features/theme.js`: aplicação e alternância do tema.
-- `assets/js/core/notifications.js`: notificações toast e feedback de partilha.
-- `assets/js/features/profile-privacy.js`: visibilidade e ocultação do email do perfil.
-- `assets/js/features/playlist.js`: persistência e operações básicas da playlist.
-- `assets/js/app.js`: ainda mantém catálogo, reprodução, carrinho, avaliações, modais, eventos e inicialização.
-
-Os módulos são carregados antes de `app.js`, através de scripts clássicos com `defer`. A comunicação entre módulos é feita por interfaces explícitas em `window.BeatsAo...`; não foi introduzido bundler nem framework.
-
-## Estrutura-alvo proposta
-
-A divisão será gradual, mantendo inicialmente o carregamento clássico e sem introduzir ferramentas de build:
+## Estrutura existente
 
 ```text
 assets/js/
-  app.js                 # ponto de entrada e inicialização
-  config/
-    constants.js         # URL e constantes não secretas
+  app.js
   core/
-    state.js             # estado central temporário
-    dom.js               # consultas DOM e utilitários comuns
-    notifications.js     # toast e feedback
-  services/
-    api.js               # chamadas HTTP à Edge Function
+    notifications.js
   features/
-    catalog.js           # carregamento, pesquisa, filtros e renderização
-    player.js            # reprodução e contador de plays
-    playlist.js          # favoritos e modal da playlist
-    cart.js              # carrinho e total
-    ratings.js           # leitura e envio de avaliações
-    downloads.js         # seleção de formato e pedido de download
-    profile.js           # perfil e privacidade do email
-    theme.js             # tema claro/escuro
-    dashboard.js         # estatísticas
-    admin.js             # autenticação e operações administrativas
-  events/
-    bindings.js          # registo central dos eventos da interface
+    cart.js
+    playlist.js
+    profile-privacy.js
+    ratings.js
+    theme.js
+  services/
+    api.js
 ```
 
-Esta é uma estrutura-alvo, não uma declaração de que os módulos já existem. A implementação deverá definir contratos explícitos entre módulos e remover gradualmente o estado global implícito.
+## Módulos extraídos e responsabilidades
 
-## Ordem de migração
+| Ficheiro | Responsabilidade | Interface |
+|---|---|---|
+| `services/api.js` | GET/POST para a Edge Function | `window.BeatsAoApi` |
+| `core/notifications.js` | Toasts e feedback de partilha | `window.BeatsAoNotifications` |
+| `features/theme.js` | Carregar e alternar tema | `window.BeatsAoTheme` |
+| `features/profile-privacy.js` | Privacidade do email do perfil | `window.BeatsAoProfilePrivacy` |
+| `features/playlist.js` | Persistência e operações da playlist | `window.BeatsAoPlaylist` |
+| `features/cart.js` | Persistência, inclusão, remoção, total e contador do carrinho | `window.BeatsAoCart` |
+| `features/ratings.js` | Carregar, submeter e calcular avaliações | `window.BeatsAoRatings` |
 
-1. Criar uma camada de API e centralizar tratamento de erros sem alterar endpoints.
-2. Isolar estado e utilitários comuns.
-3. Extrair tema, notificações e perfil, que têm dependências relativamente delimitadas.
-4. Extrair playlist e carrinho.
-5. Extrair avaliações e downloads.
-6. Separar player e catálogo, preservando o ciclo de renderização.
-7. Isolar eventos e inicialização.
-8. Só depois reavaliar a área administrativa, que atualmente está desativada e depende de segurança no backend.
+Os módulos são carregados antes de `app.js` em `index.html`. O ficheiro principal já delega as operações básicas destas áreas aos respetivos módulos, mas continua responsável pela ligação à interface e por várias regras de apresentação.
 
-## Regras de segurança e compatibilidade
+## Responsabilidades ainda concentradas em app.js
 
-- Não colocar chaves secretas do Supabase no frontend.
-- Não considerar ocultar botões ou menus como autorização.
-- Não expor passwords nem links privados na resposta pública de catálogo.
+- Catálogo: carregamento, pesquisa, filtros e renderização dos cards.
+- Player dos cards: cada card cria e controla o seu próprio objeto `Audio`.
+- Player da playlist: usa um objeto `Audio` partilhado, com progresso e tempo.
+- Modais de carrinho e playlist.
+- Integração visual das avaliações.
+- Downloads, autenticação atualmente desativada, formulário e eventos.
+- Inicialização e estado partilhado.
+
+### Atenção ao player
+
+Existem dois contextos distintos de reprodução: o áudio individual de cada card e o áudio da playlist. A extração deve impedir reprodução simultânea não intencional, manter os botões sincronizados e limpar listeners/estado ao fechar ou reconstruir a playlist. Não fundir os dois contextos sem testes.
+
+## Ordem de trabalho proposta
+
+1. Validar módulos já extraídos no navegador e corrigir inconsistências documentais.
+2. Isolar o player da playlist, mantendo o player de cada card funcional.
+3. Definir o contrato de dados e a rota de detalhe individual de cada beat.
+4. Implementar páginas de beat com URL amigável e carregamento por slug.
+5. Redesenhar os cards e a página individual com base no contrato definitivo.
+6. Separar catálogo, downloads e área administrativa.
+7. Automatizar testes e só depois avaliar integração na branch principal.
+
+## Segurança e compatibilidade
+
+- Nunca colocar chaves secretas do Supabase no frontend.
+- Não expor passwords nem links privados na resposta pública do catálogo.
 - Não confiar em preço, identidade, pagamento ou formato enviados pelo browser.
-- Preservar os IDs usados pelo HTML até que os eventos sejam migrados e testados.
-- Não alterar a branch `main` nem publicar automaticamente.
-- Cada etapa deve ser validada antes de avançar para a seguinte.
+- Ocultar um botão não substitui autorização no backend.
+- Preservar IDs e seletores existentes até os eventos correspondentes serem migrados.
+- Não publicar alterações desta branch automaticamente.
 
 ## Validação pendente
 
-A inspeção realizada foi estática, através do código no GitHub. Ainda não houve teste de browser, execução automatizada, nem chamadas de teste à API. Portanto, não se declara a aplicação funcional apenas com base nesta reorganização.
-
-
-### Carrinho
-- Arquivo: `assets/js/features/cart.js`.
-- Responsabilidade: persistência do carrinho, inclusão/remoção de beats, consulta dos itens, cálculo do total e atualização do contador.
-- API global: `window.BeatsAoCart`.
-- O `app.js` mantém apenas a integração com a interface, catálogo e checkout; não manipula diretamente o estado persistido do carrinho.
-
-
-### Avaliações
-- Arquivo: `assets/js/features/ratings.js`.
-- Responsabilidade: carregar avaliações, enviar novas notas e calcular médias e contagens por beat e no conjunto.
-- API global: `window.BeatsAoRatings`.
-- O `app.js` mantém a integração com os modais, renderização e notificações.
+As verificações até agora são sobretudo inspeções estáticas do repositório. Ainda não há evidência de testes completos no navegador nem de testes de integração contra a API. Não declarar a aplicação integralmente funcional até executar esses testes.
