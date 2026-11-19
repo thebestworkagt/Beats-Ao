@@ -40,7 +40,9 @@
 - Frontend passou a consumir `available_formats` para mostrar apenas os formatos existentes.
 - Criado o contrato de allowlist da API em `docs/API-PUBLICA-BEATS.md`.
 - Preparada migração aditiva `20261119000000_add_beat_detail_fields.sql`; não aplicada à base de dados.
-- A implementação final da página depende do endpoint seguro e da decisão de alojamento/routing.
+- Implementada uma página de detalhe por slug nesta branch, com fallback `404.html`, controlador e estilos.
+- Criado `scripts/generate-beat-pages.mjs` para gerar páginas estáticas com HTTP 200 e sitemap a partir da API pública.
+- Falta configurar/testar o workflow GitHub Pages por Actions; o fallback 404 é apenas transitório.
 
 ## Riscos confirmados na auditoria inicial
 
@@ -83,7 +85,7 @@
 ### Fase 4 — comércio e validação
 - Modelo de encomendas, pagamentos e licenças.
 - Só conceder downloads pagos após confirmação confiável do pagamento.
-- Testes automatizados e testes manuais em preview.
+- Testes automatizados e testes manuais em preview, incluindo build estático por slug.
 - Publicação apenas após validação do proprietário.
 
 ## Regras de segurança e publicação
