@@ -198,7 +198,9 @@
       <label for="fKey">Tom</label>
       <input type="text" id="fKey" placeholder="Ex: A Minor">
       <label for="fCoverFile">Imagem de Capa</label>
-      <input type="file" id="fCoverFile" accept="image/*">
+      <input type="file" id="fCoverFile" accept="image/*" disabled>
+      <label for="fCoverUrl">URL da Capa</label>
+      <input type="url" id="fCoverUrl" placeholder="https://.../capa.jpg">
       <div class="file-status" id="coverStatus">Selecionar</div>
       <label for="fAudioStream">Link de Streaming (MP3 - OpenDrive) *</label>
       <input type="url" id="fAudioStream" placeholder="https://od.lk/s/..." required>
@@ -209,6 +211,8 @@
       <label for="fAudioWav">Link Download WAV (OpenDrive)</label>
       <input type="url" id="fAudioWav" placeholder="https://od.lk/d/...">
       <div class="file-status" style="font-size:0.65rem;color:var(--text-muted);">Link para baixar WAV</div>
+      <label for="fStatus">Estado do Beat</label>
+      <select id="fStatus"><option value="draft">Rascunho (não publicado)</option><option value="published">Publicado</option><option value="archived">Arquivado</option></select>
       <label for="fPassword">Senha de Download</label>
       <input type="text" id="fPassword" placeholder="Ex: Love2026">
       <div class="file-status" style="font-size:0.65rem;color:var(--text-muted);">Senha para liberar o download</div>
