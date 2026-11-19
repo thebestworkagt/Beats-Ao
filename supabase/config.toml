@@ -1,0 +1,5 @@
+[functions.api]
+# A API expõe rotas públicas de catálogo, detalhe, ratings e preview.
+# O código da função valida os pedidos e usa a chave secreta apenas no servidor.
+# Não colocar a chave secreta em headers do browser.
+verify_jwt = false
