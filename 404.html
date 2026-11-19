@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="pt" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Detalhes do beat no Beats Ao.">
+  <meta name="robots" content="index,follow">
+  <meta property="og:type" content="music.song">
+  <meta property="og:site_name" content="Beats Ao">
+  <meta property="og:title" content="Beat | Beats Ao">
+  <meta property="og:description" content="Ouve e descobre este beat no Beats Ao.">
+  <meta property="og:url" content="https://beatsao.site/">
+  <meta property="og:image" content="https://beatsao.site/logo1.png">
+  <title>Beat | Beats Ao</title>
+  <link id="detailCanonical" rel="canonical" href="https://beatsao.site/">
+  <link rel="icon" type="image/png" href="/logo1.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/beat-detail.css">
+  <script type="application/ld+json" id="detailJsonLd">{}</script>
+</head>
+<body>
+  <main class="beat-detail-page">
+    <header class="detail-topbar">
+      <a class="detail-brand" href="/" aria-label="Beats Ao — página inicial">
+        <img src="/logo1.png" alt="">
+        <span>BEATS AO</span>
+      </a>
+      <div class="detail-toolbar">
+        <a class="detail-back" href="/"><i class="fas fa-arrow-left"></i> Catálogo</a>
+        <button class="detail-theme" id="detailThemeToggle" type="button" aria-label="Alternar tema"><i class="fas fa-moon"></i></button>
+      </div>
+    </header>
+
+    <div class="detail-breadcrumb"><a href="/">Início</a> / <span>Beat</span></div>
+
+    <div class="detail-loader" id="detailLoader"><span class="detail-spinner"></span> A carregar os detalhes do beat…</div>
+
+    <section class="detail-state" id="detailError" hidden>
+      <h1 id="detailErrorTitle">Página não encontrada</h1>
+      <p id="detailErrorMessage">Este endereço não corresponde a uma página disponível.</p>
+      <p style="margin-top:1.2rem"><a class="detail-button detail-button-primary" href="/">Voltar ao catálogo</a></p>
+    </section>
+
+    <article class="beat-detail-content" id="detailContent" hidden>
+      <section class="detail-hero">
+        <div class="detail-cover-wrap">
+          <img class="detail-cover" id="detailCover" alt="" hidden>
+          <div class="detail-cover-placeholder" id="detailCoverPlaceholder"><i class="fas fa-music"></i></div>
+        </div>
+        <div class="detail-info">
+          <span class="detail-kicker">Beat exclusivo</span>
+          <h1 class="detail-title" id="detailTitle">Beat</h1>
+          <p class="detail-artist" id="detailArtist">Artista</p>
+          <div class="detail-tags">
+            <span class="detail-tag" id="detailGenre">Género</span>
+            <span class="detail-tag" id="detailBpm">BPM</span>
+            <span class="detail-tag" id="detailKey">Tonalidade</span>
+          </div>
+          <div class="detail-stats">
+            <span><i class="fas fa-headphones"></i> <strong id="detailPlays">0 reproduções</strong></span>
+            <span><i class="fas fa-star"></i> <strong id="detailRatingAverage">0.0</strong> <span id="detailRatingCount">0 avaliações</span></span>
+          </div>
+          <div class="detail-price-row">
+            <div><div class="detail-price-label">Preço</div><div class="detail-price" id="detailPrice">—</div></div>
+          </div>
+          <div class="detail-actions">
+            <button class="detail-button detail-button-primary" id="detailCart" type="button"><i class="fas fa-cart-plus"></i> Adicionar ao carrinho</button>
+            <button class="detail-button detail-button-secondary" id="detailShare" type="button"><i class="fas fa-share-alt"></i> Partilhar</button>
+            <a class="detail-button detail-button-secondary" id="detailNegotiate" href="#"><i class="fab fa-whatsapp"></i> Negociar</a>
+          </div>
+          <div class="detail-player">
+            <div class="detail-player-head"><strong><i class="fas fa-wave-square"></i> Pré-visualização</strong><span>Áudio de demonstração</span></div>
+            <div class="detail-player-controls">
+              <button class="detail-play" id="detailPlay" type="button" aria-label="Reproduzir preview"><i class="fas fa-play"></i></button>
+              <input class="detail-seek" id="detailSeek" type="range" min="0" max="100" value="0" aria-label="Progresso do áudio">
+              <span class="detail-time" id="detailCurrentTime">0:00</span>
+              <span class="detail-time" id="detailDuration">0:00</span>
+            </div>
+            <audio id="detailAudio" preload="none"></audio>
+          </div>
+          <div class="detail-format-list">
+            <button class="detail-button detail-button-secondary" id="detailDownloadMp3" type="button" hidden><i class="fas fa-download"></i> Descarregar MP3</button>
+            <button class="detail-button detail-button-secondary" id="detailDownloadWav" type="button" hidden><i class="fas fa-download"></i> Descarregar WAV</button>
+          </div>
+          <p class="detail-notice" id="detailNotice" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section class="detail-sections">
+        <div class="detail-panel">
+          <h2>Sobre este beat</h2>
+          <p class="detail-description" id="detailDescription"></p>
+        </div>
+        <div class="detail-panel">
+          <h2>Licença e utilização</h2>
+          <p class="detail-description" id="detailLicenseSummary"></p>
+          <div class="detail-license-label">Termos adicionais</div>
+          <p class="detail-description" id="detailLicenseTerms"></p>
+        </div>
+      </section>
+
+      <section class="detail-sections">
+        <div class="detail-panel">
+          <h2>Avalia este beat</h2>
+          <p class="detail-small">A tua avaliação ajuda outros artistas a descobrir o beat.</p>
+          <div class="detail-rating-stars" id="detailRatingStars">
+            <button type="button" data-value="1" aria-label="1 estrela" aria-pressed="false">★</button>
+            <button type="button" data-value="2" aria-label="2 estrelas" aria-pressed="false">★</button>
+            <button type="button" data-value="3" aria-label="3 estrelas" aria-pressed="false">★</button>
+            <button type="button" data-value="4" aria-label="4 estrelas" aria-pressed="false">★</button>
+            <button type="button" data-value="5" aria-label="5 estrelas" aria-pressed="false">★</button>
+          </div>
+          <button class="detail-button detail-button-primary" id="detailRatingSubmit" type="button">Enviar avaliação</button>
+        </div>
+        <div class="detail-panel">
+          <h2>Formatos disponíveis</h2>
+          <p class="detail-description">Os formatos de ficheiro são apresentados apenas quando estão configurados para este beat. O acesso ao download é validado pelo servidor.</p>
+        </div>
+      </section>
+
+      <section class="detail-related" id="detailRelatedSection">
+        <h2>Poderás gostar também</h2>
+        <div class="detail-related-grid" id="detailRelated"></div>
+      </section>
+    </article>
+
+    <footer class="detail-footer">© Beats Ao — Beats exclusivos para artistas.</footer>
+  </main>
+
+  <dialog class="detail-dialog" id="downloadDialog">
+    <form id="downloadForm">
+      <h2>Confirmar download</h2>
+      <p>Introduz a palavra-passe para validar o acesso ao ficheiro selecionado.</p>
+      <label for="downloadPassword">Palavra-passe</label>
+      <input id="downloadPassword" type="password" autocomplete="current-password" maxlength="256" required>
+      <input id="downloadFormat" type="hidden" value="mp3">
+      <p class="detail-notice" id="downloadError" role="alert"></p>
+      <div class="detail-dialog-actions">
+        <button class="detail-button detail-button-secondary" type="button" id="downloadCancel">Cancelar</button>
+        <button class="detail-button detail-button-primary" type="submit">Continuar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="/assets/js/services/api.js" defer></script>
+  <script src="/assets/js/features/theme.js" defer></script>
+  <script src="/assets/js/features/cart.js" defer></script>
+  <script src="/assets/js/features/ratings.js" defer></script>
+  <script src="/assets/js/features/beat-detail-page.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var toggle = document.getElementById('detailThemeToggle');
+      if (toggle && window.BeatsAoTheme) toggle.addEventListener('click', window.BeatsAoTheme.toggle);
+      var cancel = document.getElementById('downloadCancel');
+      if (cancel) cancel.addEventListener('click', function () { document.getElementById('downloadDialog').close(); });
+    });
+  </script>
+</body>
+</html>
