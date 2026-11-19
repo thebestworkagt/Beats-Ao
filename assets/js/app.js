@@ -421,8 +421,13 @@
       const infoDiv = document.createElement('div');
       infoDiv.className = 'beat-info';
       
-      const titleInfo = document.createElement('div');
+      const detailUrl = getBeatDetailUrl(beat.slug);
+      const titleInfo = document.createElement(detailUrl ? 'a' : 'div');
       titleInfo.className = 'beat-title';
+      if (detailUrl) {
+        titleInfo.href = detailUrl;
+        titleInfo.setAttribute('aria-label', `Abrir detalhes do beat ${beat.title}`);
+      }
       titleInfo.innerHTML = `${beat.title} <i class="fas fa-wave-square"></i>`;
       
       const metaDiv = document.createElement('div');
@@ -531,7 +536,6 @@
         updateCart();
       });
       
-      const detailUrl = getBeatDetailUrl(beat.slug);
       if (detailUrl) {
         const detailsBtn = document.createElement('a');
         detailsBtn.className = 'btn-details';
