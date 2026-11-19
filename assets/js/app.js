@@ -121,10 +121,20 @@
       window.BeatsAoNotifications.showShareToast(message);
     }
 
+    function getBeatDetailUrl(slug) {
+      if (typeof slug !== 'string' || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+        return null;
+      }
+      return `/beats/${encodeURIComponent(slug)}/`;
+    }
+
     function shareBeat(beat) {
-      const baseUrl = window.location.origin + window.location.pathname;
-      const slug = beat.slug || beat.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-      const shareUrl = `${baseUrl}?beat=${slug}`;
+      const relativeUrl = getBeatDetailUrl(beat.slug);
+      if (!relativeUrl) {
+        showToast('Link indisponível', 'Este beat ainda não tem um slug válido.', 'error');
+        return;
+      }
+      const shareUrl = new URL(relativeUrl, window.location.origin).toString();
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(shareUrl).then(() => showShareToast('Link do beat copiado'))
           .catch(() => fallbackCopy(shareUrl));
@@ -521,6 +531,16 @@
         updateCart();
       });
       
+      const detailUrl = getBeatDetailUrl(beat.slug);
+      if (detailUrl) {
+        const detailsBtn = document.createElement('a');
+        detailsBtn.className = 'btn-details';
+        detailsBtn.href = detailUrl;
+        detailsBtn.innerHTML = '<i class="fas fa-arrow-up-right-from-square"></i> Ver detalhes';
+        detailsBtn.setAttribute('aria-label', `Ver detalhes do beat ${beat.title}`);
+        actionsDiv.appendChild(detailsBtn);
+      }
+
       const negociarBtn = document.createElement('a');
       negociarBtn.className = 'btn-negociar';
       negociarBtn.href = '#';
