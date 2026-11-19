@@ -15,8 +15,6 @@
     let isLoggedIn = false;
     let currentUser = null;
     let selectedCoverFile = null;
-    let playlistAudio = null;
-    let playlistAudioId = null;
     let currentBeatId = null;
     let selectedFormat = null;
     
@@ -860,7 +858,7 @@
       const container = document.getElementById('playlistContainer');
       const emptyMsg = document.getElementById('emptyPlaylist');
       const playlist = getPlaylist();
-      if (playlistAudio) { playlistAudio.pause(); playlistAudio = null; playlistAudioId = null; }
+      window.BeatsAoPlaylistPlayer.stop();
       if (playlist.length === 0) { container.innerHTML = ''; emptyMsg.style.display = 'block'; }
       else {
         emptyMsg.style.display = 'none';
@@ -899,31 +897,12 @@
             playMiniBtn.addEventListener('click', () => {
               const audioUrl = playMiniBtn.dataset.audio;
               if (!audioUrl) { showToast('Áudio indisponível', 'Este beat não possui áudio.', 'error'); return; }
-              if (playlistAudioId === beat.id && playlistAudio && !playlistAudio.paused) {
-                playlistAudio.pause(); playMiniBtn.innerHTML = '<i class="fas fa-play"></i>'; playMiniBtn.classList.remove('playing'); playlistAudioId = null; return;
-              }
-              if (playlistAudio) { playlistAudio.pause(); document.querySelectorAll('.btn-play-mini').forEach(b => { b.innerHTML = '<i class="fas fa-play"></i>'; b.classList.remove('playing'); }); }
-              playlistAudio = new Audio(audioUrl);
-              playlistAudio.volume = 0.7;
-              playlistAudioId = beat.id;
-              playMiniBtn.innerHTML = '<i class="fas fa-pause"></i>';
-              playMiniBtn.classList.add('playing');
-              playlistAudio.play().catch(() => {});
-              playlistAudio.addEventListener('timeupdate', () => {
-                if (playlistAudio.duration) {
-                  const percent = (playlistAudio.currentTime / playlistAudio.duration) * 100;
-                  if (progressMini) progressMini.style.width = percent + '%';
-                  const mins = Math.floor(playlistAudio.currentTime / 60);
-                  const secs = Math.floor(playlistAudio.currentTime % 60);
-                  if (timeMini) timeMini.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-                }
-              });
-              playlistAudio.addEventListener('ended', () => {
-                playMiniBtn.innerHTML = '<i class="fas fa-play"></i>';
-                playMiniBtn.classList.remove('playing');
-                if (progressMini) progressMini.style.width = '0%';
-                if (timeMini) timeMini.textContent = '0:00';
-                playlistAudioId = null;
+              window.BeatsAoPlaylistPlayer.toggle({
+                id: beat.id,
+                url: audioUrl,
+                button: playMiniBtn,
+                progress: progressMini,
+                time: timeMini
               });
             });
             container.appendChild(item);
@@ -1058,7 +1037,7 @@
     document.getElementById('dropdownLogout').addEventListener('click', doLogout);
     document.getElementById('dropdownPlaylist').addEventListener('click', openPlaylistModal);
     document.getElementById('playlistCancel').addEventListener('click', () => {
-      if (playlistAudio) { playlistAudio.pause(); playlistAudio = null; playlistAudioId = null; }
+      window.BeatsAoPlaylistPlayer.stop();
       document.getElementById('playlistModal').classList.remove('active');
     });
     
