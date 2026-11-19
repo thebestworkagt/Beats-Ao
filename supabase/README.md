@@ -42,7 +42,7 @@ A ordem abaixo evita interromper a API antiga antes de a versão privilegiada es
 
 O candidato está em `functions/api/index.ts`. Mantém os caminhos utilizados pelo frontend e acrescenta `GET /beat/:slug`. Usa `SUPABASE_SECRET_KEYS` (chave `default`) exclusivamente no servidor; não usa a chave pública para consultar colunas privadas. A configuração `config.toml` define `verify_jwt = false` porque o browser chama estas rotas públicas sem JWT; a própria função aplica validações e nunca devolve a chave.
 
-**Ainda não foi publicado no Supabase.** Depende das migrações de campos, contador e Storage e da validação em ambiente de teste. Não copiar para produção antes de rever os pontos pendentes abaixo.
+**Ainda não foi publicado no Supabase.** Depende das migrações de campos, contador e Storage, da transferência dos ficheiros comerciais para o bucket privado e da validação em ambiente de teste. Não copiar para produção antes de rever os pontos pendentes abaixo.
 
 ### Melhorias incluídas
 
@@ -61,6 +61,7 @@ O candidato está em `functions/api/index.ts`. Mantém os caminhos utilizados pe
 - `POST /rate` continua anónimo e não tem limitação persistente de frequência; a identidade fornecida pelo browser não é aceite como prova de identidade.
 - `POST /download` continua a comparar uma password guardada em texto simples. O ficheiro vem do bucket privado e recebe URL assinado por 120 segundos, mas isto continua a ser um controlo temporário, não prova de compra/licença.
 - Os ficheiros antigos ainda existentes no bucket público `audios` continuam acessíveis pelos URLs antigos até serem copiados para o bucket privado e removidos do bucket público. A migração não copia nem apaga ficheiros.
+- O URL assinado de 120 segundos não pode ser revogado individualmente após emissão; renomear, mover ou apagar o objeto invalida o caminho original, mas os links emitidos podem continuar funcionais até a expiração/cache.
 - Não existe ainda autenticação administrativa nem CRUD de beats.
 - CORS não é autenticação e não impede chamadas diretas fora do navegador.
 - A migração para revogar grants diretos está preparada, mas não aplicada; as permissões RLS antigas permanecem no SQL e devem ser revistas após restringir os grants.
