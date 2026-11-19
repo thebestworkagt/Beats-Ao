@@ -76,8 +76,40 @@ function buildPage(template, beat) {
     url: canonical
   }
 
+  const formats = beat.available_formats || {}
+  const price = beat.price || 'Preço sob consulta'
+  const descriptionText = beat.description || 'Ainda não foi adicionada uma descrição para este beat.'
+  const licenseSummary = beat.license_summary || 'As condições de licença serão apresentadas antes da compra.'
+  const licenseTerms = beat.license_terms || 'Não foram publicados termos adicionais de licença.'
+  const plays = Number(beat.plays || 0)
+
   return template
     .replace('<title>Beat | Beats Ao</title>', `<title>${escapeHtml(title)}</title>`)
+    .replace('<article class="beat-detail-content" id="detailContent" hidden>', '<article class="beat-detail-content" id="detailContent" data-static-page="true">')
+    .replace('<div class="detail-loader" id="detailLoader">', '<div class="detail-loader" id="detailLoader" hidden>')
+    .replace('<img class="detail-cover" id="detailCover" alt="" hidden>', `<img class="detail-cover" id="detailCover" src="${escapeHtml(image)}" alt="Capa de ${escapeHtml(beat.title || 'beat')}" loading="lazy">`)
+    .replace('<div class="detail-cover-placeholder" id="detailCoverPlaceholder">', '<div class="detail-cover-placeholder" id="detailCoverPlaceholder" hidden>')
+    .replace('<h1 class="detail-title" id="detailTitle">Beat</h1>', `<h1 class="detail-title" id="detailTitle">${escapeHtml(beat.title || 'Beat')}</h1>`)
+    .replace('<p class="detail-artist" id="detailArtist">Artista</p>', `<p class="detail-artist" id="detailArtist">${escapeHtml(beat.artist || 'Artista')}</p>`)
+    .replace('<span class="detail-tag" id="detailGenre">Género</span>', `<span class="detail-tag" id="detailGenre">${escapeHtml(beat.genre || 'Género não indicado')}</span>`)
+    .replace('<span class="detail-tag" id="detailBpm">BPM</span>', `<span class="detail-tag" id="detailBpm">${escapeHtml(beat.bpm ? `${beat.bpm} BPM` : 'BPM não indicado')}</span>`)
+    .replace('<span class="detail-tag" id="detailKey">Tonalidade</span>', `<span class="detail-tag" id="detailKey">${escapeHtml(beat.key || 'Tonalidade não indicada')}</span>`)
+    .replace('<strong id="detailPlays">0 reproduções</strong>', `<strong id="detailPlays">${plays} reproduções</strong>`)
+    .replace('<div class="detail-price" id="detailPrice">—</div>', `<div class="detail-price" id="detailPrice">${escapeHtml(price)}</div>`)
+    .replace('<p class="detail-description" id="detailDescription"></p>', `<p class="detail-description" id="detailDescription">${escapeHtml(descriptionText)}</p>`)
+    .replace('<p class="detail-description" id="detailLicenseSummary"></p>', `<p class="detail-description" id="detailLicenseSummary">${escapeHtml(licenseSummary)}</p>`)
+    .replace('<p class="detail-description" id="detailLicenseTerms"></p>', `<p class="detail-description" id="detailLicenseTerms">${escapeHtml(licenseTerms)}</p>`)
+    .replace('id="detailDownloadMp3" type="button" hidden', `id="detailDownloadMp3" type="button"${formats.mp3 === true ? '' : ' hidden'}`)
+    .replace('id="detailDownloadWav" type="button" hidden', `id="detailDownloadWav" type="button"${formats.wav === true ? '' : ' hidden'}`)
+    .replace('content="Detalhes do beat no Beats Ao."', `content="${escapeHtml(description)}"`)
+    .replace('content="Beat | Beats Ao"', `content="${escapeHtml(title)}"`)
+    .replace('content="Ouve e descobre este beat no Beats Ao."', `content="${escapeHtml(description)}"`)
+    .replace('content="https://beatsao.site/"', `content="${escapeHtml(canonical)}"`)
+    .replace('content="https://beatsao.site/logo1.png"', `content="${escapeHtml(image)}"`)
+    .replace('href="https://beatsao.site/"', `href="${escapeHtml(canonical)}"`)
+    .replace('<script type="application/ld+json" id="detailJsonLd">{}</script>',
+      `<script type="application/ld+json" id="detailJsonLd">${safeJsonForHtml(schema)}</script>`)
+}
     .replace('content="Detalhes do beat no Beats Ao."', `content="${escapeHtml(description)}"`)
     .replace('content="Beat | Beats Ao"', `content="${escapeHtml(title)}"`)
     .replace('content="Ouve e descobre este beat no Beats Ao."', `content="${escapeHtml(description)}"`)
