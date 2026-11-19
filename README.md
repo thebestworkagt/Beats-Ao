@@ -7,14 +7,18 @@ Plataforma de beats. Este repositório está a ser reorganizado por camadas para
 ```text
 .
 ├── index.html                 # Documento de entrada do site
-├── 404.html                   # Fallback de rotas individuais em GitHub Pages
+├── 404.html                   # Template HTML usado pelas Pages Functions
 ├── assets/
 │   ├── css/
 │   │   └── main.css           # Estilos atualmente extraídos do HTML
 │   └── js/
 │       └── app.js             # Lógica atualmente extraída do HTML
+├── functions/
+│   ├── beats/[slug].js         # Rota dinâmica de detalhe no Cloudflare
+│   └── sitemap.xml.js          # Sitemap dinâmico
+├── _routes.json                # Limita as rotas que invocam Functions
 ├── scripts/
-│   └── generate-beat-pages.mjs # Gera páginas estáticas por slug
+│   └── generate-beat-pages.mjs # Exportação estática opcional por slug
 ├── docs/
 │   ├── BUILD-PAGINAS-ESTATICAS.md
 │   └── PLANO-IMPLEMENTACAO.md # Requisitos, riscos e fases de trabalho
