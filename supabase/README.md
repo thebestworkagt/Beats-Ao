@@ -19,11 +19,12 @@ supabase/
 
 ## Migrações preparadas
 
+- `migrations/20261119050000_auto_generate_beat_slugs.sql`: gera slugs URL-friendly únicos, corrige slugs antigos vazios/inválidos e preserva slugs válidos já existentes.
 - `migrations/20261119000000_add_beat_detail_fields.sql`: adiciona descrição, resumo/termos de licença e estado de publicação.
 - `migrations/20261119010000_atomic_beat_plays.sql`: cria incremento atómico de reproduções para beats publicados e limita a RPC ao backend.
 - `migrations/20261119030000_private_beat_downloads.sql`: cria o bucket privado `beat-downloads`, acrescenta colunas de caminhos de ficheiros e bloqueia acesso de browser ao novo bucket.
 
-As três migrações automáticas ainda não foram aplicadas.
+As quatro migrações automáticas ainda não foram aplicadas.
 
 O endurecimento de grants foi separado para `manual/restrict_direct_table_access.sql`. O bloqueio de alterações dos clientes no bucket de previews está em `manual/lock_public_audios_writes.sql`. Estes scripts não são executados automaticamente pelo Supabase CLI.
 
@@ -32,7 +33,8 @@ O endurecimento de grants foi separado para `manual/restrict_direct_table_access
 A ordem abaixo evita interromper a API antiga antes de a versão privilegiada estar ativa:
 
 1. Fazer backup e testar numa instância de desenvolvimento.
-2. Aplicar as três migrações automáticas em ordem: `20261119000000_add_beat_detail_fields.sql`, `20261119010000_atomic_beat_plays.sql` e `20261119030000_private_beat_downloads.sql`.
+2. Aplicar primeiro `20261119050000_auto_generate_beat_slugs.sql`; confirmar que todos os beats têm slugs válidos e únicos.
+3. Aplicar as três migrações automáticas restantes em ordem: `20261119000000_add_beat_detail_fields.sql`, `20261119010000_atomic_beat_plays.sql` e `20261119030000_private_beat_downloads.sql`.
 4. Copiar cada ficheiro comercial MP3/WAV para `beat-downloads`, usando `beats/<id>/mp3/<nome>.mp3` e `beats/<id>/wav/<nome>.wav`; preencher `download_mp3_path` e `download_wav_path` com caminhos relativos.
 5. Antes de remover objetos antigos do bucket público `audios`, confirmar que cada preview continua a usar o URL antigo e que cada download foi copiado e testado no bucket privado. Só depois remover os antigos objetos comerciais.
 6. Publicar `functions/api/index.ts`; confirmar que a função lê `SUPABASE_SECRET_KEYS` no runtime.
@@ -41,7 +43,7 @@ A ordem abaixo evita interromper a API antiga antes de a versão privilegiada es
 9. Só depois de a nova Edge Function estar publicada e testada, executar manualmente `manual/restrict_direct_table_access.sql`; testar que consultas diretas às tabelas falham com a chave pública e repetir os testes da API.
 10. Publicar o frontend que lê `available_formats`; testar MP3, WAV e beat sem ficheiros disponíveis.
 
-**Não aplicar o passo 8 antes do passo 5 e da validação do passo 6.** A revogação de grants foi separada das migrações automáticas para impedir que um `db push` a execute antes da nova API. O script do bucket `audios` mantém a leitura pública; não tornar o bucket inteiro privado sem separar primeiro os previews, pois a reprodução pode parar.
+**Não aplicar o passo 9 antes do passo 6 e da validação do passo 7.** A revogação de grants foi separada das migrações automáticas para impedir que um `db push` a execute antes da nova API. O script do bucket `audios` mantém a leitura pública; não tornar o bucket inteiro privado sem separar primeiro os previews, pois a reprodução pode parar.
 
 ## Integração com Cloudflare Pages
 
