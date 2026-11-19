@@ -33,25 +33,23 @@ DECLARE
   candidate text;
   suffix integer := 2;
 BEGIN
-  -- Mantém um slug já válido, exceto quando entra em conflito com outro registo.
+  -- Preserva um slug válido já atribuído; caso contrário, deriva-o do título.
   IF NEW.slug IS NOT NULL
-     AND NEW.slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'
-     AND NOT EXISTS (
-       SELECT 1
-       FROM public.beats b
-       WHERE b.slug = NEW.slug
-         AND b.id IS DISTINCT FROM NEW.id
-     ) THEN
-    RETURN NEW;
+     AND NEW.slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$' THEN
+    base_slug := NEW.slug;
+  ELSE
+    base_slug := public.beats_make_slug(NEW.title);
   END IF;
 
-  base_slug := public.beats_make_slug(NEW.title);
-  IF base_slug = '' THEN
+  IF base_slug = '' OR base_slug IS NULL THEN
     base_slug := 'beat';
   END IF;
   base_slug := left(base_slug, 140);
-  candidate := base_slug;
 
+  -- Serializa a atribuição do mesmo slug-base para evitar colisões concorrentes.
+  PERFORM pg_advisory_xact_lock(hashtext(base_slug)::bigint);
+
+  candidate := base_slug;
   WHILE EXISTS (
     SELECT 1
     FROM public.beats b
