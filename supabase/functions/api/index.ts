@@ -138,138 +138,12 @@ function isValidPrivatePath(
   if (!value.startsWith(prefix)) return false
 
   const filename = value.slice(prefix.length)
-  const escapedFormat = format === 'mp3' ? 'mp3' : 'wav'
-  return new RegExp(`^[A-Za-z0-9][A-Za-z0-9_-]{0,100}\\.${escapedFormat}import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+  if (!filename || filename.includes('/') || filename.includes('\\')) return false
+  if (filename.includes('..') || filename.includes('?') || filename.includes('#')) return false
 
-const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
-const secretKeysRaw = Deno.env.get('SUPABASE_SECRET_KEYS') ?? ''
-
-let secretKeys: Record<string, string>
-try {
-  secretKeys = JSON.parse(secretKeysRaw) as Record<string, string>
-} catch {
-  throw new Error('Invalid Supabase secret-key configuration')
-}
-
-const supabaseSecretKey = secretKeys.default
-
-if (!supabaseUrl || !supabaseSecretKey) {
-  throw new Error('Missing Supabase server configuration')
-}
-
-// Este cliente privilegiado só existe no servidor da Edge Function.
-// Nunca copiar SUPABASE_SECRET_KEYS ou a chave obtida daqui para o frontend.
-const supabase = createClient(supabaseUrl, supabaseSecretKey, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-    detectSessionInUrl: false
-  }
-})
-
-const allowedOrigins = new Set([
-  'https://beatsao.site',
-  'https://www.beatsao.site',
-  'https://thebestworkagt.github.io'
-])
-
-const maxBodyBytes = 8 * 1024
-
-type PublicBeat = {
-  id: number
-  title: string
-  artist: string
-  genre: string | null
-  price: string
-  bpm: number | null
-  key: string | null
-  cover: string | null
-  audio: string | null
-  slug: string
-  plays: number | null
-  description: string | null
-  license_summary: string | null
-  license_terms: string | null
-  download_mp3_path: string | null
-  download_wav_path: string | null
-}
-
-function corsHeaders(origin: string | null): Headers {
-  const headers = new Headers({
-    'Content-Type': 'application/json; charset=utf-8',
-    'Cache-Control': 'no-store',
-    'Vary': 'Origin',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type'
-  })
-
-  if (origin && allowedOrigins.has(origin)) {
-    headers.set('Access-Control-Allow-Origin', origin)
-  }
-
-  return headers
-}
-
-function jsonResponse(
-  body: unknown,
-  status = 200,
-  origin: string | null = null
-): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: corsHeaders(origin)
-  })
-}
-
-function toPublicBeat(beat: PublicBeat) {
-  return {
-    id: beat.id,
-    title: beat.title,
-    artist: beat.artist,
-    genre: beat.genre,
-    price: beat.price,
-    bpm: beat.bpm,
-    key: beat.key,
-    cover: beat.cover,
-    audio: beat.audio,
-    slug: beat.slug,
-    plays: beat.plays ?? 0,
-    description: beat.description,
-    license_summary: beat.license_summary,
-    license_terms: beat.license_terms,
-    available_formats: {
-      mp3: Boolean(beat.download_mp3_path),
-      wav: Boolean(beat.download_wav_path)
-    }
-  }
-}
-
-async function readJson(req: Request): Promise<Record<string, unknown>> {
-  const contentLength = Number(req.headers.get('content-length') || 0)
-  if (contentLength > maxBodyBytes) {
-    throw new Error('Request body too large')
-  }
-
-  const raw = await req.text()
-  if (new TextEncoder().encode(raw).byteLength > maxBodyBytes) {
-    throw new Error('Request body too large')
-  }
-
-  const parsed: unknown = raw ? JSON.parse(raw) : {}
-  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new Error('Invalid JSON body')
-  }
-
-  return parsed as Record<string, unknown>
-}
-
-function positiveInteger(value: unknown): number | null {
-  const number = typeof value === 'number' ? value : Number(value)
-  return Number.isSafeInteger(number) && number > 0 ? number : null
-}
-
-, 'i')
-    .test(filename)
+  const extension = filename.slice(filename.lastIndexOf('.') + 1).toLowerCase()
+  const basename = filename.slice(0, filename.lastIndexOf('.'))
+  return extension === format && /^[A-Za-z0-9][A-Za-z0-9_-]{0,100}$/.test(basename)
 }
 
 function safeFilename(title: string, extension: string): string {
@@ -431,7 +305,7 @@ Deno.serve(async (req: Request) => {
     }
 
     // POST /download — assina por 120 segundos um objeto no bucket privado.
-    // A password atual continua sendo um controle legado e não substitui compra/licença.
+    // A password atual é um controlo legado e não substitui compra/licença.
     if (path.length === 1 && path[0] === 'download' && req.method === 'POST') {
       let body: Record<string, unknown>
       try {
