@@ -7,12 +7,16 @@ Plataforma de beats. Este repositório está a ser reorganizado por camadas para
 ```text
 .
 ├── index.html                 # Documento de entrada do site
+├── 404.html                   # Fallback de rotas individuais em GitHub Pages
 ├── assets/
 │   ├── css/
 │   │   └── main.css           # Estilos atualmente extraídos do HTML
 │   └── js/
 │       └── app.js             # Lógica atualmente extraída do HTML
+├── scripts/
+│   └── generate-beat-pages.mjs # Gera páginas estáticas por slug
 ├── docs/
+│   ├── BUILD-PAGINAS-ESTATICAS.md
 │   └── PLANO-IMPLEMENTACAO.md # Requisitos, riscos e fases de trabalho
 ├── supabase/
 │   └── README.md              # Organização prevista para funções e migrações
@@ -26,13 +30,15 @@ Plataforma de beats. Este repositório está a ser reorganizado por camadas para
 
 - Estrutura e conteúdo HTML: `index.html`.
 - Aparência e estilos: `assets/css/main.css`.
-- Comportamento do frontend: `assets/js/app.js`.
+- Comportamento do catálogo: `assets/js/app.js`.
+- Página individual: `assets/js/features/beat-detail-page.js` e `assets/css/beat-detail.css`.
+- Geração de páginas estáticas: `node scripts/generate-beat-pages.mjs`.
 - Requisitos e decisões técnicas: `docs/`.
 - Funções Edge e migrações SQL: `supabase/` (a organizar e versionar após validação).
 
 ## Publicação
 
-O site atual é publicado a partir da raiz do repositório. Por isso, `index.html`, `CNAME`, `sitemap.xml` e o ficheiro de verificação Google permanecem na raiz. Não alterar a pasta de publicação nem mover estes ficheiros sem atualizar e testar a configuração do alojamento.
+O site atual é publicado a partir da raiz do repositório. Por isso, `index.html`, `404.html`, `CNAME`, `sitemap.xml` e o ficheiro de verificação Google permanecem na raiz. Não alterar a pasta de publicação sem atualizar e testar a configuração do alojamento. O gerador estático prepara `dist/` com páginas individuais reais; a publicação desse artefacto por GitHub Actions ainda não foi configurada.
 
 ## Regras para contribuições
 
@@ -45,4 +51,4 @@ O site atual é publicado a partir da raiz do repositório. Por isso, `index.htm
 
 ## Estado da reorganização
 
-A extração inicial do CSS e do JavaScript foi feita numa branch de desenvolvimento. A refatoração funcional do código continua pendente; esta primeira etapa apenas separa ficheiros sem redesenhar nem reescrever a aplicação.
+A extração inicial do CSS/JavaScript, módulos básicos, players e primeira versão das páginas individuais foi feita na branch `hardening/admin-foundation`. A página detalhada e o gerador estão preparados, mas dependem da API nova no Supabase e da configuração de publicação por GitHub Actions para produzir páginas HTTP 200.
