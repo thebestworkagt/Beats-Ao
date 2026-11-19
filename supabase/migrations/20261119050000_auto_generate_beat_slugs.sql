@@ -74,9 +74,10 @@ ON public.beats
 FOR EACH ROW
 EXECUTE FUNCTION public.beats_assign_slug();
 
--- Corrige registos antigos sem slug ou com formato inválido.
--- Slugs válidos existentes (como "beat-x") permanecem inalterados.
-DO $$
+-- Corrige registos antigos sem slug, com formato inválido ou duplicados.
+-- Em cada grupo duplicado, preserva o registo de menor id e regenera os restantes.
+-- O trigger deriva o novo slug do título e acrescenta sufixos quando necessário.
+DO $
 DECLARE
   beat_row record;
 BEGIN
@@ -84,15 +85,46 @@ BEGIN
     SELECT id
     FROM public.beats
     WHERE slug IS NULL
-       OR slug !~ '^[a-z0-9]+(-[a-z0-9]+)*$'
+       OR slug !~ '^[a-z0-9]+(-[a-z0-9]+)*CREATE UNIQUE INDEX IF NOT EXISTS beats_slug_unique_idx
+  ON public.beats (slug);
+
+COMMENT ON FUNCTION public.beats_make_slug(text) IS
+  'Normaliza títulos de beats para slugs URL-friendly.';
+COMMENT ON FUNCTION public.beats_assign_slug() IS
+  'Gera um slug válido e único antes de inserir/atualizar um beat.';
+
     ORDER BY id
   LOOP
     UPDATE public.beats
-    SET slug = NULL
+    SET slug = '!'
+    WHERE id = beat_row.id;
+  END LOOP;
+
+  FOR beat_row IN
+    SELECT id
+    FROM (
+      SELECT
+        id,
+        row_number() OVER (PARTITION BY slug ORDER BY id) AS duplicate_position
+      FROM public.beats
+      WHERE slug ~ '^[a-z0-9]+(-[a-z0-9]+)*CREATE UNIQUE INDEX IF NOT EXISTS beats_slug_unique_idx
+  ON public.beats (slug);
+
+COMMENT ON FUNCTION public.beats_make_slug(text) IS
+  'Normaliza títulos de beats para slugs URL-friendly.';
+COMMENT ON FUNCTION public.beats_assign_slug() IS
+  'Gera um slug válido e único antes de inserir/atualizar um beat.';
+
+    ) ranked
+    WHERE duplicate_position > 1
+    ORDER BY id
+  LOOP
+    UPDATE public.beats
+    SET slug = '!'
     WHERE id = beat_row.id;
   END LOOP;
 END;
-$$;
+$;
 
 -- Impede duplicados no futuro. Se já existir uma restrição/índice equivalente,
 -- o índice IF NOT EXISTS evita recriá-lo pelo mesmo nome.
