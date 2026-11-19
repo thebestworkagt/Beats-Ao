@@ -117,14 +117,15 @@
 
   function bindPlayer() {
     const audio = elements.previewAudio;
-    if (!beat.audio) {
+    const previewUrl = safeImageUrl(beat.audio);
+    if (!previewUrl) {
       elements.playButton.disabled = true;
       elements.playButton.title = 'Preview indisponível';
       elements.duration.textContent = 'Sem preview';
       return;
     }
 
-    audio.src = beat.audio;
+    audio.src = previewUrl;
     elements.playButton.addEventListener('click', async () => {
       if (audio.paused) {
         try {
