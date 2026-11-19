@@ -369,7 +369,7 @@ Deno.serve(async (req: Request) => {
     if (path[0] === 'admin' && path[1] === 'beats') {
       const adminUid = Deno.env.get('ADMIN_USER_ID') ?? '';
       const authorization = req.headers.get('authorization') ?? '';
-      const tokenMatch = authorization.match(/^Bearer\\s+(.+)$/i);
+      const tokenMatch = authorization.match(/^Bearer\s+(.+)$/i);
       if (!adminUid || !tokenMatch) {
         return jsonResponse({ error: 'Unauthorized' }, 401, origin);
       }
