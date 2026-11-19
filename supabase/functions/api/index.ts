@@ -51,6 +51,8 @@ type PublicBeat = {
   license_terms: string | null
   download_mp3_path: string | null
   download_wav_path: string | null
+  audio_download_mp3: string | null
+  audio_download_wav: string | null
 }
 
 function corsHeaders(origin: string | null): Headers {
@@ -97,8 +99,12 @@ function toPublicBeat(beat: PublicBeat) {
     license_summary: beat.license_summary,
     license_terms: beat.license_terms,
     available_formats: {
-      mp3: Boolean(beat.download_mp3_path),
-      wav: Boolean(beat.download_wav_path)
+      mp3: Boolean(beat.download_mp3_path || beat.audio_download_mp3),
+      wav: Boolean(beat.download_wav_path || beat.audio_download_wav)
+    },
+    downloads: {
+      mp3: beat.audio_download_mp3,
+      wav: beat.audio_download_wav
     }
   }
 }
@@ -183,7 +189,7 @@ Deno.serve(async (req: Request) => {
           'id', 'title', 'artist', 'genre', 'price', 'bpm', 'key',
           'cover', 'audio', 'slug', 'plays', 'description',
           'license_summary', 'license_terms', 'download_mp3_path',
-          'download_wav_path', 'status'
+          'download_wav_path', 'audio_download_mp3', 'audio_download_wav', 'status'
         ].join(','))
         .eq('status', 'published')
         .order('id', { ascending: false })
