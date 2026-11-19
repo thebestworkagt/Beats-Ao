@@ -20,8 +20,8 @@ BEGIN
       ADD CONSTRAINT beats_status_allowed
       CHECK (status IN ('draft', 'published', 'archived'));
   END IF;
-END
-$$;
+END;
+$;
 
 CREATE INDEX IF NOT EXISTS beats_public_slug_idx
   ON public.beats (slug)
