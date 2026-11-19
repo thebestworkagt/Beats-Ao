@@ -31,6 +31,8 @@
 - Criada a especificação de URL e routing em `docs/ROTAS-E-PAGINAS-BEATS.md`.
 - Criada a função candidata `supabase/functions/api/index.ts` com catálogo por allowlist e consulta por slug.
 - Preparado incremento atómico de reproduções em `20261119010000_atomic_beat_plays.sql`; não aplicado.
+- Preparada revogação dos grants diretos `anon`/`authenticated` em `20261119020000_restrict_direct_table_access.sql`; não aplicada.
+- Edge Function passou a usar `SUPABASE_SECRET_KEYS` apenas no servidor, para permitir retirar o acesso direto do browser às tabelas.
 - Frontend passou a consumir `available_formats` para mostrar apenas os formatos existentes.
 - Criado o contrato de allowlist da API em `docs/API-PUBLICA-BEATS.md`.
 - Preparada migração aditiva `20261119000000_add_beat_detail_fields.sql`; não aplicada à base de dados.
@@ -58,7 +60,7 @@
 - Definir autenticação administrativa no servidor.
 - Separar campos públicos de campos privados.
 - Remover segredos e URLs protegidas das respostas públicas.
-- Corrigir permissões SQL, RLS e políticas de Storage com base no modelo de autorização.
+- Aplicar e testar a migração de grants restritos; rever policies RLS residuais e separar previews públicos de downloads privados no Storage.
 - Criar downloads autorizados e links temporários quando apropriado.
 - Validar tipos, limites, erros, CORS e proteção contra abuso.
 
