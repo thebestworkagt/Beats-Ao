@@ -43,6 +43,10 @@ A ordem abaixo evita interromper a API antiga antes de a versão privilegiada es
 
 **Não aplicar o passo 8 antes do passo 5 e da validação do passo 6.** A revogação de grants foi separada das migrações automáticas para impedir que um `db push` a execute antes da nova API. O script do bucket `audios` mantém a leitura pública; não tornar o bucket inteiro privado sem separar primeiro os previews, pois a reprodução pode parar.
 
+## Integração com Cloudflare Pages
+
+O frontend é alojado no Cloudflare Pages. As rotas de apresentação por slug ficam em `functions/beats/[slug].js` e o sitemap dinâmico em `functions/sitemap.xml.js`. O Pages Function consulta a Edge Function Supabase por `GET /beat/:slug`; não recebe nem guarda a chave secreta do Supabase. O `_routes.json` limita a execução das Functions a `/beats/*` e `/sitemap.xml`.
+
 ## Edge Function versionada
 
 O candidato está em `functions/api/index.ts`. Mantém os caminhos utilizados pelo frontend e acrescenta `GET /beat/:slug`. Usa `SUPABASE_SECRET_KEYS` (chave `default`) exclusivamente no servidor; não usa a chave pública para consultar colunas privadas. A configuração `config.toml` define `verify_jwt = false` porque o browser chama estas rotas públicas sem JWT; a própria função aplica validações e nunca devolve a chave.
