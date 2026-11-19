@@ -49,7 +49,7 @@ O frontend é alojado no Cloudflare Pages. As rotas de apresentação por slug f
 
 ## Edge Function versionada
 
-O candidato está em `functions/api/index.ts`. Mantém os caminhos utilizados pelo frontend e acrescenta `GET /beat/:slug`. Usa `SUPABASE_SECRET_KEYS` (chave `default`) exclusivamente no servidor; não usa a chave pública para consultar colunas privadas. A configuração `config.toml` define `verify_jwt = false` porque o browser chama estas rotas públicas sem JWT; a própria função aplica validações e nunca devolve a chave.
+O candidato Supabase está em `supabase/functions/api/index.ts`. Mantém os caminhos utilizados pelo frontend e acrescenta `GET /beat/:slug`. Usa `SUPABASE_SECRET_KEYS` (chave `default`) exclusivamente no servidor; não usa a chave pública para consultar colunas privadas. A configuração `config.toml` define `verify_jwt = false` porque o browser chama estas rotas públicas sem JWT; a própria função aplica validações e nunca devolve a chave.
 
 **Ainda não foi publicado no Supabase.** Depende das migrações de campos, contador e Storage, da transferência dos ficheiros comerciais para o bucket privado e da validação em ambiente de teste. Não copiar para produção antes de rever os pontos pendentes abaixo.
 
