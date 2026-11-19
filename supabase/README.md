@@ -13,6 +13,10 @@ supabase/
     └── YYYYMMDDHHMMSS_descricao.sql
 ```
 
+## Migrações preparadas
+
+- `migrations/20261119000000_add_beat_detail_fields.sql`: adiciona descrição, resumo/termos de licença e estado de publicação, sem apagar ou reescrever os campos atuais. Ainda não foi aplicada.
+
 ## Estado
 
 O código atualmente publicado da Edge Function `api` foi copiado pelo proprietário para a conversa e analisado, mas ainda não foi validado como versão canónica nem migrado para este repositório.
