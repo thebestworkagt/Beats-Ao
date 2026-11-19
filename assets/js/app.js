@@ -428,40 +428,76 @@
         titleInfo.href = detailUrl;
         titleInfo.setAttribute('aria-label', `Abrir detalhes do beat ${beat.title}`);
       }
-      titleInfo.innerHTML = `${beat.title} <i class="fas fa-wave-square"></i>`;
-      
+      titleInfo.textContent = beat.title || 'Beat';
+      const titleIcon = document.createElement('i');
+      titleIcon.className = 'fas fa-wave-square';
+      titleInfo.append(' ', titleIcon);
+
       const metaDiv = document.createElement('div');
       metaDiv.className = 'beat-meta';
       const genreSpan = document.createElement('span');
       genreSpan.className = 'beat-genre';
-      genreSpan.innerHTML = `<i class="fas fa-tag"></i> ${beat.genre}`;
+      const genreIcon = document.createElement('i');
+      genreIcon.className = 'fas fa-tag';
+      genreSpan.append(genreIcon, document.createTextNode(` ${beat.genre || 'Género não indicado'}`));
+
       const priceSpan = document.createElement('span');
       priceSpan.className = 'beat-price';
-      priceSpan.innerHTML = `<i class="fas fa-coins"></i> ${beat.price}`;
+      const priceIcon = document.createElement('i');
+      priceIcon.className = 'fas fa-coins';
+      priceSpan.append(priceIcon, document.createTextNode(` ${beat.price || 'Preço sob consulta'}`));
       metaDiv.appendChild(genreSpan);
       metaDiv.appendChild(priceSpan);
-      
+
       const exclusivo = document.createElement('div');
       exclusivo.className = 'beat-exclusivo';
-      exclusivo.innerHTML = `<i class="fas fa-certificate"></i> exclusivo · apenas aqui`;
-      
+      const exclusiveIcon = document.createElement('i');
+      exclusiveIcon.className = 'fas fa-certificate';
+      exclusivo.append(exclusiveIcon, document.createTextNode(' exclusivo · apenas aqui'));
+
       const avgRating = getBeatAverageRating(beat.id);
       const ratingCount = getBeatRatingCount(beat.id);
-      const starsFull = Math.round(avgRating);
+      const starsFull = Math.max(0, Math.min(5, Math.round(avgRating)));
       const starsEmpty = 5 - starsFull;
-      
+
       const statsDiv = document.createElement('div');
       statsDiv.className = 'beat-stats';
-      statsDiv.innerHTML = `
-        <span class="beat-plays"><i class="fas fa-headphones"></i> ${beat.plays || 0} plays</span>
-        <span class="beat-rating">
-          <i class="fas fa-star"></i> 
-          <span class="stars">${'★'.repeat(starsFull)}${'☆'.repeat(starsEmpty)}</span>
-          <span style="font-size:0.6rem;color:var(--text-muted);">${avgRating ? avgRating.toFixed(1) : '0.0'} (${ratingCount})</span>
-        </span>
-        ${beat.bpm ? `<span><i class="fas fa-waveform"></i> ${beat.bpm} BPM</span>` : ''}
-        ${beat.key ? `<span><i class="fas fa-music"></i> ${beat.key}</span>` : ''}
-      `;
+
+      const playsSpan = document.createElement('span');
+      playsSpan.className = 'beat-plays';
+      const playsIcon = document.createElement('i');
+      playsIcon.className = 'fas fa-headphones';
+      playsSpan.append(playsIcon, document.createTextNode(` ${Number(beat.plays || 0)} plays`));
+      statsDiv.appendChild(playsSpan);
+
+      const ratingSpan = document.createElement('span');
+      ratingSpan.className = 'beat-rating';
+      const ratingIcon = document.createElement('i');
+      ratingIcon.className = 'fas fa-star';
+      const starsSpan = document.createElement('span');
+      starsSpan.className = 'stars';
+      starsSpan.textContent = '★'.repeat(starsFull) + '☆'.repeat(starsEmpty);
+      const ratingValue = document.createElement('span');
+      ratingValue.style.fontSize = '0.6rem';
+      ratingValue.style.color = 'var(--text-muted)';
+      ratingValue.textContent = `${avgRating ? avgRating.toFixed(1) : '0.0'} (${ratingCount})`;
+      ratingSpan.append(ratingIcon, document.createTextNode(' '), starsSpan, document.createTextNode(' '), ratingValue);
+      statsDiv.appendChild(ratingSpan);
+
+      if (beat.bpm) {
+        const bpmSpan = document.createElement('span');
+        const bpmIcon = document.createElement('i');
+        bpmIcon.className = 'fas fa-waveform';
+        bpmSpan.append(bpmIcon, document.createTextNode(` ${beat.bpm} BPM`));
+        statsDiv.appendChild(bpmSpan);
+      }
+      if (beat.key) {
+        const keySpan = document.createElement('span');
+        const keyIcon = document.createElement('i');
+        keyIcon.className = 'fas fa-music';
+        keySpan.append(keyIcon, document.createTextNode(` ${beat.key}`));
+        statsDiv.appendChild(keySpan);
+      }
       
       // DOWNLOAD BOTÕES
       const downloadDiv = document.createElement('div');
