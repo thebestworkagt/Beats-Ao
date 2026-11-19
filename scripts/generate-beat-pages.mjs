@@ -109,6 +109,7 @@ function buildPage(template, beat) {
     .replace('href="https://beatsao.site/"', `href="${escapeHtml(canonical)}"`)
     .replace('<script type="application/ld+json" id="detailJsonLd">{}</script>',
       `<script type="application/ld+json" id="detailJsonLd">${safeJsonForHtml(schema)}</script>`)
+    .replace('</head>', `<script id="beatPageData" type="application/json">${safeJsonForHtml(beat)}</script>\\n</head>`)
 }
 async function main() {
   const response = await fetch(`${apiBaseUrl}/beats`, {
