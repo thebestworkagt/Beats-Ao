@@ -102,10 +102,6 @@ function toPublicBeat(beat: PublicBeat) {
       mp3: Boolean(beat.download_mp3_path || beat.audio_download_mp3),
       wav: Boolean(beat.download_wav_path || beat.audio_download_wav)
     },
-    downloads: {
-      mp3: beat.audio_download_mp3,
-      wav: beat.audio_download_wav
-    }
   }
 }
 
@@ -333,7 +329,7 @@ Deno.serve(async (req: Request) => {
 
       const { data: beat, error } = await supabase
         .from('beats')
-        .select('id,title,password,download_mp3_path,download_wav_path,status')
+        .select('id,title,password,download_mp3_path,download_wav_path,audio_download_mp3,audio_download_wav,status')
         .eq('slug', beatSlug)
         .eq('status', 'published')
         .maybeSingle()
@@ -347,27 +343,40 @@ Deno.serve(async (req: Request) => {
       }
 
       const storedPath = format === 'mp3' ? beat.download_mp3_path : beat.download_wav_path
-      if (!isValidPrivatePath(storedPath, beat.id, format)) {
-        return jsonResponse({ success: false, error: 'Este formato ainda não está disponível no armazenamento privado' }, 404, origin)
-      }
-
+      const directUrl = format === 'mp3' ? beat.audio_download_mp3 : beat.audio_download_wav
       const filename = safeFilename(beat.title ?? 'beat', format)
-      const { data: signedData, error: signedError } = await supabase
-        .storage
-        .from('beat-downloads')
-        .createSignedUrl(storedPath, 120, { download: filename })
 
-      if (signedError || !signedData?.signedUrl) {
-        console.error('Private download signing failed:', signedError?.message ?? 'Missing signed URL')
-        return jsonResponse({ success: false, error: 'Não foi possível preparar o download' }, 500, origin)
+      if (isValidPrivatePath(storedPath, beat.id, format)) {
+        const { data: signedData, error: signedError } = await supabase
+          .storage
+          .from('beat-downloads')
+          .createSignedUrl(storedPath, 120, { download: filename })
+
+        if (signedError || !signedData?.signedUrl) {
+          console.error('Private download signing failed:', signedError?.message ?? 'Missing signed URL')
+          return jsonResponse({ success: false, error: 'Não foi possível preparar o download' }, 500, origin)
+        }
+
+        return jsonResponse({
+          success: true,
+          url: signedData.signedUrl,
+          filename,
+          expires_in: 120
+        }, 200, origin)
       }
 
-      return jsonResponse({
-        success: true,
-        url: signedData.signedUrl,
-        filename,
-        expires_in: 120
-      }, 200, origin)
+      if (typeof directUrl === 'string' && directUrl.length <= 2048) {
+        try {
+          const parsedUrl = new URL(directUrl)
+          if (parsedUrl.protocol === 'https:') {
+            return jsonResponse({ success: true, url: parsedUrl.toString(), filename }, 200, origin)
+          }
+        } catch {
+          // URL inválido: segue para a resposta de formato indisponível.
+        }
+      }
+
+      return jsonResponse({ success: false, error: 'Este formato ainda não está disponível' }, 404, origin)
     }
 
 
