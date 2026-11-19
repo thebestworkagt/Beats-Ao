@@ -29,6 +29,7 @@ const supabase = createClient(supabaseUrl, supabaseSecretKey, {
 const allowedOrigins = new Set([
   'https://beatsao.site',
   'https://www.beatsao.site',
+  'https://hardening-admin-foundation.beatsao.pages.dev',
   'https://thebestworkagt.github.io'
 ])
 
@@ -211,7 +212,7 @@ Deno.serve(async (req: Request) => {
           'id', 'title', 'artist', 'genre', 'price', 'bpm', 'key',
           'cover', 'audio', 'slug', 'plays', 'description',
           'license_summary', 'license_terms', 'download_mp3_path',
-          'download_wav_path', 'status'
+          'download_wav_path', 'audio_download_mp3', 'audio_download_wav', 'status'
         ].join(','))
         .eq('slug', slug)
         .eq('status', 'published')
