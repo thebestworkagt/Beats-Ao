@@ -20,25 +20,16 @@ SET
 
 -- Defesa adicional: bloqueia acessos do browser ao bucket privado,
 -- mesmo se existir outra policy permissiva genérica em storage.objects.
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1
-    FROM pg_policies
-    WHERE schemaname = 'storage'
-      AND tablename = 'objects'
-      AND policyname = 'Deny client access to private beat downloads'
-  ) THEN
-    CREATE POLICY "Deny client access to private beat downloads"
-      ON storage.objects
-      AS RESTRICTIVE
-      FOR ALL
-      TO anon, authenticated
-      USING (bucket_id <> 'beat-downloads')
-      WITH CHECK (bucket_id <> 'beat-downloads');
-  END IF;
-END;
-$$;
+DROP POLICY IF EXISTS "Deny client access to private beat downloads"
+  ON storage.objects;
+
+CREATE POLICY "Deny client access to private beat downloads"
+  ON storage.objects
+  AS RESTRICTIVE
+  FOR ALL
+  TO anon, authenticated
+  USING (bucket_id <> 'beat-downloads')
+  WITH CHECK (bucket_id <> 'beat-downloads');
 
 COMMENT ON COLUMN public.beats.download_mp3_path IS
   'Caminho relativo no bucket privado beat-downloads; nunca URL pública.';
