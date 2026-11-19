@@ -9,6 +9,7 @@
     // 1. ESTADO GLOBAL
     // ============================================================
     let beatsData = [];
+    let adminBeatsData = [];
     let filteredBeats = [];
     let editMode = false;
     let editingId = null;
@@ -760,7 +761,8 @@
       if (!isLoggedIn) return;
       
       document.getElementById('fCoverFile').value = '';
-      document.getElementById('coverStatus').textContent = 'Selecionar';
+      document.getElementById('coverStatus').textContent = 'Upload de ficheiros será ativado numa etapa própria.';
+      document.getElementById('fCoverUrl').value = '';
       document.getElementById('previewContainer').innerHTML = '';
       document.getElementById('fAudioStream').value = '';
       document.getElementById('fAudioMp3').value = '';
@@ -779,6 +781,8 @@
         document.getElementById('fAudioMp3').value = beat.audio_download_mp3 || '';
         document.getElementById('fAudioWav').value = beat.audio_download_wav || '';
         document.getElementById('fPassword').value = beat.password || '';
+        document.getElementById('fCoverUrl').value = beat.cover || '';
+        document.getElementById('fStatus').value = beat.status || 'published';
         editingId = beat.id;
         if (beat.cover) { 
           const div = document.createElement('div'); 
@@ -791,6 +795,8 @@
         document.getElementById('beatForm').reset();
         document.getElementById('fBpm').value = '';
         document.getElementById('fKey').value = '';
+        document.getElementById('fCoverUrl').value = '';
+        document.getElementById('fStatus').value = 'draft';
         editingId = null;
       }
       document.getElementById('formModal').classList.add('active');
@@ -803,8 +809,63 @@
     }
 
     function openEditModal(id) {
-      const beat = beatsData.find(b => b.id === id);
+      const beat = adminBeatsData.find(b => Number(b.id) === Number(id)) || beatsData.find(b => Number(b.id) === Number(id));
       if (beat) openFormModal(beat);
+    }
+
+    function parseAdminPrice(value) {
+      const cleaned = String(value || '').trim().replace(/[^0-9,.-]/g, '');
+      const normalized = cleaned.includes(',') ? cleaned.replace(/\\./g, '').replace(',', '.') : cleaned;
+      const amount = Number(normalized);
+      return Number.isFinite(amount) && amount >= 0 ? amount : NaN;
+    }
+
+    async function refreshAdminBeats() {
+      const response = await BeatsAoApi.adminGet('admin/beats');
+      if (!response.ok) throw new Error('Não foi possível carregar os beats administrativos.');
+      adminBeatsData = await response.json();
+      return adminBeatsData;
+    }
+
+    async function saveBeat(e) {
+      e.preventDefault();
+      if (!isLoggedIn) return;
+      const payload = {
+        title: document.getElementById('fTitle').value.trim(),
+        artist: document.getElementById('fArtist').value.trim(),
+        genre: document.getElementById('fGenre').value.trim(),
+        price: parseAdminPrice(document.getElementById('fPrice').value),
+        bpm: document.getElementById('fBpm').value.trim() ? Number(document.getElementById('fBpm').value) : null,
+        key: document.getElementById('fKey').value.trim() || null,
+        cover: document.getElementById('fCoverUrl').value.trim() || null,
+        audio: document.getElementById('fAudioStream').value.trim(),
+        audio_download_mp3: document.getElementById('fAudioMp3').value.trim() || null,
+        audio_download_wav: document.getElementById('fAudioWav').value.trim() || null,
+        password: document.getElementById('fPassword').value || null,
+        status: document.getElementById('fStatus').value
+      };
+      if (!payload.title || !payload.artist || !payload.genre || !payload.audio || !Number.isFinite(payload.price)) {
+        showToast('Dados inválidos', 'Confere título, artista, género, preço e link de streaming.', 'error');
+        return;
+      }
+      const button = document.getElementById('modalSave');
+      button.disabled = true;
+      try {
+        const response = editingId
+          ? await BeatsAoApi.adminPut('admin/beats/' + editingId, payload)
+          : await BeatsAoApi.adminPost('admin/beats', payload);
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || 'Não foi possível guardar o beat.');
+        await refreshAdminBeats();
+        await loadBeats();
+        closeFormModal();
+        showToast('Guardado', 'Os dados do beat foram atualizados.', 'success');
+      } catch (error) {
+        console.error('Admin save failed:', error);
+        showToast('Erro ao guardar', error.message || 'Não foi possível guardar o beat.', 'error');
+      } finally {
+        button.disabled = false;
+      }
     }
 
     // ============================================================
@@ -992,17 +1053,59 @@
     // ============================================================
     // 20. AUTH - FUNÇÕES DESATIVADAS
     // ============================================================
-    function doLogin(e) {
+    async function doLogin(e) {
       e.preventDefault();
-      showToast('Admin desativado', 'O modo administrador está temporariamente indisponível.', 'error');
+      const errorBox = document.getElementById('loginError');
+      errorBox.style.display = 'none';
+      try {
+        const { data, error } = await BeatsAoApi.auth.auth.signInWithPassword({
+          email: document.getElementById('loginEmail').value.trim(),
+          password: document.getElementById('loginPass').value
+        });
+        if (error || !data?.user) throw new Error('Email ou senha inválidos.');
+        if (data.user.id !== 'da274bef-08da-44e7-bd8f-0541c3847273') {
+          await BeatsAoApi.auth.auth.signOut();
+          throw new Error('Esta conta não tem autorização administrativa.');
+        }
+        currentUser = data.user;
+        await refreshAdminBeats();
+        isLoggedIn = true;
+        document.getElementById('loginModal').classList.remove('active');
+        document.getElementById('loginPass').value = '';
+        await loadBeats();
+        updateUI();
+        showToast('Sessão iniciada', 'Acesso administrativo autorizado.', 'success');
+      } catch (error) {
+        console.error('Admin login failed:', error);
+        errorBox.textContent = error.message || 'Não foi possível iniciar sessão.';
+        errorBox.style.display = 'block';
+      }
     }
 
-    function doLogout() {
-      showToast('Admin desativado', 'O modo administrador está temporariamente indisponível.', 'error');
+    async function doLogout() {
+      await BeatsAoApi.auth.auth.signOut();
+      isLoggedIn = false;
+      currentUser = null;
+      adminBeatsData = [];
+      editMode = false;
+      await loadBeats();
+      updateUI();
+      showToast('Sessão terminada', 'Saiu do painel administrativo.', 'info');
     }
 
     async function deleteBeat(id) {
-      showToast('Funcionalidade indisponível', 'A exclusão de beats está temporariamente indisponível.', 'error');
+      if (!isLoggedIn || !confirm('Tens a certeza de que pretendes apagar este beat?')) return;
+      try {
+        const response = await BeatsAoApi.adminDelete('admin/beats/' + id);
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || 'Não foi possível apagar o beat.');
+        await refreshAdminBeats();
+        await loadBeats();
+        showToast('Beat apagado', 'O beat foi removido.', 'success');
+      } catch (error) {
+        console.error('Admin delete failed:', error);
+        showToast('Erro', error.message || 'Não foi possível apagar o beat.', 'error');
+      }
     }
 
     // ============================================================
@@ -1023,16 +1126,14 @@
     });
     document.getElementById('loginCancel').addEventListener('click', () => document.getElementById('loginModal').classList.remove('active'));
     document.getElementById('loginForm').addEventListener('submit', doLogin);
+    document.getElementById('beatForm').addEventListener('submit', saveBeat);
     
-    document.getElementById('dropdownNewBeat').addEventListener('click', () => {
-      showToast('Admin desativado', 'O modo administrador está temporariamente indisponível.', 'error');
-    });
+    document.getElementById('dropdownNewBeat').addEventListener('click', () => openFormModal());
     document.getElementById('formCancel').addEventListener('click', closeFormModal);
     
-    document.getElementById('fCoverFile').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) { document.getElementById('coverStatus').textContent = `📷 ${file.name} (${(file.size/1024).toFixed(1)} KB)`; }
-      else { document.getElementById('coverStatus').textContent = 'Selecionar'; }
+    document.getElementById('fCoverFile').addEventListener('change', () => {
+      showToast('Upload ainda não disponível', 'Por enquanto, informa o URL da imagem no campo próprio.', 'info');
+      document.getElementById('fCoverFile').value = '';
     });
     
     document.getElementById('dropdownToggleEdit').addEventListener('click', function() {
@@ -1158,6 +1259,22 @@
       loadTheme();
       isLoggedIn = false;
       currentUser = null;
+      const { data: sessionData } = await BeatsAoApi.auth.auth.getSession();
+      const savedUser = sessionData?.session?.user;
+      if (savedUser?.id === 'da274bef-08da-44e7-bd8f-0541c3847273') {
+        try {
+          currentUser = savedUser;
+          await refreshAdminBeats();
+          isLoggedIn = true;
+        } catch (error) {
+          console.warn('Admin session could not be verified:', error);
+          await BeatsAoApi.auth.auth.signOut();
+          currentUser = null;
+          isLoggedIn = false;
+        }
+      } else if (savedUser) {
+        await BeatsAoApi.auth.auth.signOut();
+      }
       await loadBeats();
       updateUI();
       console.log('Beats Ao v1.0 - Supabase Edge Function');
