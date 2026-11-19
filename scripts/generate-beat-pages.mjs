@@ -110,16 +110,6 @@ function buildPage(template, beat) {
     .replace('<script type="application/ld+json" id="detailJsonLd">{}</script>',
       `<script type="application/ld+json" id="detailJsonLd">${safeJsonForHtml(schema)}</script>`)
 }
-    .replace('content="Detalhes do beat no Beats Ao."', `content="${escapeHtml(description)}"`)
-    .replace('content="Beat | Beats Ao"', `content="${escapeHtml(title)}"`)
-    .replace('content="Ouve e descobre este beat no Beats Ao."', `content="${escapeHtml(description)}"`)
-    .replace('content="https://beatsao.site/"', `content="${escapeHtml(canonical)}"`)
-    .replace('content="https://beatsao.site/logo1.png"', `content="${escapeHtml(image)}"`)
-    .replace('href="https://beatsao.site/"', `href="${escapeHtml(canonical)}"`)
-    .replace('<script type="application/ld+json" id="detailJsonLd">{}</script>',
-      `<script type="application/ld+json" id="detailJsonLd">${safeJsonForHtml(schema)}</script>`)
-}
-
 async function main() {
   const response = await fetch(`${apiBaseUrl}/beats`, {
     headers: { Accept: 'application/json' }
