@@ -416,7 +416,14 @@
       elements.content.hidden = false;
       elements.error.hidden = true;
     } catch (error) {
-      showError('Não foi possível abrir este beat', error.message || 'Verifica a ligação e tenta novamente.');
+      if (elements.content.dataset.staticPage === 'true') {
+        elements.loader.hidden = true;
+        elements.error.hidden = true;
+        elements.content.hidden = false;
+        showNotice('A apresentação guardada está disponível, mas não foi possível atualizar os dados em tempo real.', true);
+      } else {
+        showError('Não foi possível abrir este beat', error.message || 'Verifica a ligação e tenta novamente.');
+      }
     }
   }
 
