@@ -208,8 +208,8 @@ Deno.serve(async (req: Request) => {
         .select([
           'id', 'title', 'artist', 'genre', 'price', 'bpm', 'key',
           'cover', 'audio', 'slug', 'plays', 'description',
-          'license_summary', 'license_terms', 'audio_download_mp3',
-          'audio_download_wav', 'status'
+          'license_summary', 'license_terms', 'download_mp3_path',
+          'download_wav_path', 'status'
         ].join(','))
         .eq('slug', slug)
         .eq('status', 'published')
