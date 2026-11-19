@@ -42,17 +42,17 @@ O frontend não deve tentar inferir disponibilidade MP3/WAV a partir de URLs pri
 - Detalhe: localizar por `slug`, devolver um único beat e aplicar o mesmo filtro de publicação.
 - Beat em rascunho ou arquivado: responder como não encontrado para visitantes, sem revelar que existe.
 - Slug: usar o valor persistido na tabela, que já possui restrição de unicidade; não gerar um slug diferente no frontend.
-- Ratings: devolver médias/contagens agregadas sem expor identificadores de utilizadores.
+- Ratings: para compatibilidade com o módulo atual, o endpoint devolve apenas pares `beat_id` e `rating`; nunca expõe `user_id`. A agregação pode ser feita no frontend até existir contrato agregado próprio.
 
 ## Compatibilidade e migração
 
 A tabela atual usa `price text`; não converter o tipo nesta migração. Os campos `description`, `license_summary`, `license_terms` e `status` são adicionados de forma aditiva. Os registos existentes passam a `published` por omissão para preservar a visibilidade atual.
 
-Migração preparada em `supabase/migrations/20261119000000_add_beat_detail_fields.sql`. Ainda não foi aplicada à base de dados.
+Migrações preparadas em `supabase/migrations/20261119000000_add_beat_detail_fields.sql` e `supabase/migrations/20261119010000_atomic_beat_plays.sql`. Ainda não foram aplicadas à base de dados. A Edge Function candidata está em `supabase/functions/api/index.ts`, mas ainda não foi publicada.
 
 ## Bloqueios antes da página pública final
 
-1. Implementar e publicar o endpoint com esta allowlist.
+1. Aplicar as migrações numa base de teste, publicar uma versão de preview da função e validar a allowlist.
 2. Validar que o endpoint não devolve URLs privados nem passwords.
 3. Escolher e configurar o mecanismo de routing/geração de páginas compatível com o alojamento.
 4. Confirmar o comportamento para slugs inválidos, beats não publicados e refresh em URL direto.
