@@ -1,62 +1,63 @@
 # URLs e páginas individuais dos beats
 
-## Objetivo
+## Contrato de URL
 
-Cada beat publicado deverá ter uma página própria, partilhável e indexável, com URL canónico no formato:
+Cada beat publicado usa o slug persistido em `public.beats.slug`:
 
 `https://beatsao.site/beats/<slug>/`
 
-Exemplo ilustrativo: `/beats/noite-de-verao/`. O slug real deverá vir do campo único `beats.slug`; não deve ser recriado de forma diferente no frontend.
+O frontend não inventa o slug a partir do título. Slugs devem ser únicos, minúsculos e conter apenas letras, números e hífen.
 
-## Conteúdo esperado da página
+## Implementação preparada nesta branch
+
+- `404.html`: fallback visual para pedidos de páginas de beat que não existam fisicamente no GitHub Pages.
+- `assets/css/beat-detail.css`: estilos responsivos da página individual.
+- `assets/js/features/beat-detail-page.js`: carrega `GET /beat/:slug`, apresenta detalhes e integra preview, carrinho, avaliações, partilha, downloads e beats relacionados.
+- `app.js`: os cards incluem o acesso "Ver detalhes"; a partilha usa a URL canónica do beat.
+- `scripts/generate-beat-pages.mjs`: gera ficheiros estáticos `dist/beats/<slug>/index.html` para cada beat publicado, atualiza metadados Open Graph, JSON-LD e sitemap.
+- `assets/css/main.css`: estilo do novo link nos cards.
+
+## Limite do fallback GitHub Pages
+
+O `404.html` permite que o navegador mostre a página de detalhes mantendo o URL `/beats/<slug>/`, mas o pedido original continua a ser uma resposta HTTP 404. É um fallback de compatibilidade, não routing real com HTTP 200 e não deve ser tratado como solução final de SEO. A documentação GitHub Pages descreve este ficheiro como página personalizada de erro 404: [Custom 404 page](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-custom-404-page-for-your-github-pages-site).
+
+## Publicação adequada para SEO
+
+O gerador estático cria uma pasta `index.html` por slug. Quando o diretório `dist` for publicado como artefacto do GitHub Pages, cada rota existente passa a ser um ficheiro estático próprio com HTTP 200, título, description, canonical, Open Graph e JSON-LD preparados no build.
+
+O gerador está pronto, mas ainda não existe um workflow de publicação por GitHub Actions nesta branch. A mudança da origem de publicação em Settings → Pages → Build and deployment → Source para GitHub Actions tem de ser planeada e testada antes de substituir a publicação atual por branch. O GitHub documenta esse modo de publicação aqui: [Configuring a publishing source](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
+
+## Dependências de backend
+
+O detalhe usa a rota `GET /beat/:slug` da Edge Function candidata. A API ainda não foi publicada e as migrações Supabase ainda não foram aplicadas; por isso, a página não estará operacional em produção até essa etapa.
+
+As respostas públicas devem seguir a allowlist em `docs/API-PUBLICA-BEATS.md`. O frontend não recebe passwords, tokens, caminhos privados ou URLs de downloads.
+
+## Conteúdo da página
 
 - Capa, título, artista e descrição.
 - Género, BPM e tonalidade.
 - Player de preview.
-- Preço e estado de disponibilidade.
-- Opções MP3/WAV apenas quando cada formato estiver realmente disponível.
-- Avaliações e beats relacionados.
-- Condições de licença e chamada para compra.
-- Metadados SEO: title, description, canonical e Open Graph.
-
-## Decisão técnica: alojamento estático
-
-O site atual é publicado no GitHub Pages. Esse alojamento não executa código de servidor para resolver dinamicamente qualquer slug. Criar apenas um link para `/beats/<slug>/` não garante que o GitHub Pages encontre a página.
-
-As opções são:
-
-1. **Páginas estáticas geradas por beat** — melhor para SEO e partilha. Um processo de build cria `beats/<slug>/index.html` para cada beat publicado. Exige uma fonte pública de dados segura e um processo de atualização quando o catálogo muda.
-2. **Fallback SPA/404** — mantém o URL solicitado e deixa o JavaScript resolver o slug. É uma solução de transição, mas pode devolver estado HTTP 404 e prejudicar indexação/partilha por crawlers.
-3. **Alojamento com routing no servidor/edge** — Cloudflare Pages Functions ou Worker pode resolver `/beats/:slug` e devolver a página correta. Exige preparar e validar a migração do alojamento e DNS.
-
-## Contrato de dados
-
-A resposta pública deve limitar-se a uma allowlist definida em `docs/API-PUBLICA-BEATS.md`. O modelo de dados recebeu uma migração aditiva preparada em `supabase/migrations/20261119000000_add_beat_detail_fields.sql`, que acrescenta descrição, resumo/termos de licença e estado de publicação. As migrações ainda não foram aplicadas. O candidato de API já está versionado em `supabase/functions/api/index.ts`, mas não foi publicado.
-
-## Recomendação
-
-Não implementar a rota definitiva antes de corrigir o endpoint público do catálogo. Atualmente, a Edge Function descrita no projeto usa `select('*')` em `beats`, o que pode expor campos que nunca devem sair para visitantes, incluindo password e links de download protegidos.
-
-A sequência segura é:
-
-1. Criar uma resposta pública de catálogo com allowlist explícita de campos.
-2. Garantir que o slug é único, estável e validado no backend.
-3. Escolher entre geração estática e routing Cloudflare. Para SEO completo, preferir páginas estáticas geradas ou uma resposta HTML renderizada no edge.
-4. Implementar página de detalhe e URLs canónicos.
-5. Atualizar os cards para abrir a página do respetivo beat.
-6. Testar URL direto, refresh, navegação, partilha, beat inexistente e beat não publicado.
+- Preço.
+- MP3/WAV apenas quando o backend confirma disponibilidade.
+- Avaliações.
+- Resumo e termos de licença.
+- Negociação e adicionar ao carrinho.
+- Beats relacionados.
 
 ## Regras funcionais
 
-- Cada card abre a página do seu próprio beat.
-- O URL é derivado do slug persistido, nunca do título em tempo real.
-- Beats sem slug válido não devem receber URL improvisado; devem ser corrigidos no catálogo.
-- Beats não publicados não podem ser expostos por URL direto.
-- Editar título não altera automaticamente o slug existente.
+- Cada card tem uma ligação para a página do respetivo beat, se o slug for válido.
+- A partilha copia o URL individual, não o antigo parâmetro `?beat=`.
+- Beats não publicados são tratados como não encontrados pelo backend.
+- Editar título não altera automaticamente o slug.
 - Alterar slug exige redirecionamento do endereço anterior ou manutenção de aliases.
-- A página pública nunca recebe password, credenciais, tokens nem URLs de download. O Storage ainda precisa de migração: o bucket `audios` foi observado como público e não se pode assumir que URLs guardados nele sejam privados.
-- Os botões MP3 e WAV só aparecem quando o backend confirma que o caminho do formato existe no bucket privado; o backend continua a validar cada pedido e emite URL temporário de 120 segundos.
+- Um URL assinado de download tem validade limitada; não é uma licença nem prova de compra.
 
-## Estado
+## Validação pendente
 
-Este documento define o contrato e as dependências. As páginas e rotas ainda não foram implementadas. A branch principal não foi alterada.
+As verificações realizadas nesta branch são estáticas: sintaxe JavaScript, correspondência de IDs no HTML, ordem de scripts e presença das referências aos endpoints. Ainda falta:
+1. Publicar as migrações e a Edge Function num ambiente de teste.
+2. Testar uma página com um beat real e confirmar player, ratings, carrinho, MP3/WAV e beats relacionados.
+3. Executar o gerador com a API real e rever o `dist`.
+4. Preparar e testar o workflow de publicação GitHub Pages com a origem Actions, sem interromper a produção.
