@@ -815,7 +815,7 @@
 
     function parseAdminPrice(value) {
       const cleaned = String(value || '').trim().replace(/[^0-9,.-]/g, '');
-      const normalized = cleaned.includes(',') ? cleaned.replace(/\\./g, '').replace(',', '.') : cleaned;
+      const normalized = cleaned.includes(',') ? cleaned.replace(/\./g, '').replace(',', '.') : cleaned;
       const amount = Number(normalized);
       return Number.isFinite(amount) && amount >= 0 ? amount : NaN;
     }
