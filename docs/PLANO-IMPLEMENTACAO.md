@@ -33,6 +33,7 @@
 - Implementado `functions/beats/[slug].js` como Cloudflare Pages Function, devolvendo HTTP 200 e HTML pré-renderizado por slug.
 - Implementado `functions/sitemap.xml.js` para sitemap dinâmico.
 - Criado `_routes.json` para executar Functions apenas nas rotas de beats e sitemap.
+- Criado `docs/CONFIGURACAO-CLOUDFLARE-PAGES.md` com os requisitos de build output, preview deployment e testes de publicação.
 - Mantido `404.html` como template de HTML reutilizado pela Function; não é o mecanismo de routing.
 - Implementados links de detalhe nos cards e URLs de partilha `/beats/<slug>/`.
 - Criado o gerador `scripts/generate-beat-pages.mjs`, que pré-renderiza `dist/beats/<slug>/index.html` com metadados e sitemap.
