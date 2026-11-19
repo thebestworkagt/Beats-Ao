@@ -45,6 +45,7 @@ Os módulos são carregados antes de `app.js` em `index.html`. O ficheiro princi
 - `functions/beats/[slug].js` resolve `/beats/:slug`, consulta a API Supabase e devolve HTML pré-renderizado com HTTP 200.
 - `functions/sitemap.xml.js` constrói `/sitemap.xml` a partir do catálogo público.
 - `_routes.json` limita as invocações das Functions a `/beats/*` e `/sitemap.xml`; o catálogo e os assets permanecem estáticos.
+- `docs/CONFIGURACAO-CLOUDFLARE-PAGES.md` documenta como testar a branch num deployment preview sem alterar produção.
 - `404.html` é o template HTML que a Function transforma, não o mecanismo de routing.
 - `features/beat-detail-page.js` hidrata os dados públicos embutidos no HTML e liga preview, download, avaliação, carrinho, partilha e relacionados.
 - `scripts/generate-beat-pages.mjs` permanece como ferramenta opcional de exportação estática; não é exigido pela rota Cloudflare.
