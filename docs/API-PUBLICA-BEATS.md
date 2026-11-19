@@ -34,7 +34,9 @@ A disponibilidade de formato deve ser calculada no servidor a partir da configur
 - `user_id`
 - chaves, tokens, credenciais, hashes ou dados internos de autorização
 
-O frontend não deve tentar inferir disponibilidade MP3/WAV a partir de URLs privadas.
+O frontend não deve tentar inferir disponibilidade MP3/WAV a partir de URLs de ficheiros.
+
+**Limite importante:** a auditoria encontrou o bucket `audios` público. Retirar o URL da resposta do catálogo não torna privado um objeto que continua num bucket público. A migração de Storage precisa de inventariar o campo `audio` (preview) e os downloads para separar os dois tipos de ficheiro sem quebrar a reprodução.
 
 ## Regras de consulta
 
@@ -48,11 +50,12 @@ O frontend não deve tentar inferir disponibilidade MP3/WAV a partir de URLs pri
 
 A tabela atual usa `price text`; não converter o tipo nesta migração. Os campos `description`, `license_summary`, `license_terms` e `status` são adicionados de forma aditiva. Os registos existentes passam a `published` por omissão para preservar a visibilidade atual.
 
-Migrações preparadas em `supabase/migrations/20261119000000_add_beat_detail_fields.sql` e `supabase/migrations/20261119010000_atomic_beat_plays.sql`. Ainda não foram aplicadas à base de dados. A Edge Function candidata está em `supabase/functions/api/index.ts`, mas ainda não foi publicada.
+Migrações preparadas em `supabase/migrations/20261119000000_add_beat_detail_fields.sql`, `supabase/migrations/20261119010000_atomic_beat_plays.sql` e `supabase/migrations/20261119020000_restrict_direct_table_access.sql`. Ainda não foram aplicadas à base de dados. A última revoga grants diretos de `anon`/`authenticated`; a Edge Function passa a usar a chave secreta no runtime. A Edge Function candidata está em `supabase/functions/api/index.ts`, mas ainda não foi publicada.
 
 ## Bloqueios antes da página pública final
 
-1. Aplicar as migrações numa base de teste, publicar uma versão de preview da função e validar a allowlist.
+1. Aplicar as três migrações numa base de teste, testar os acessos diretos com a chave pública e publicar uma versão de preview da função.
+2. Separar no Storage previews públicos de downloads privados; não declarar downloads seguros enquanto o bucket `audios` continuar público.
 2. Validar que o endpoint não devolve URLs privados nem passwords.
 3. Escolher e configurar o mecanismo de routing/geração de páginas compatível com o alojamento.
 4. Confirmar o comportamento para slugs inválidos, beats não publicados e refresh em URL direto.
