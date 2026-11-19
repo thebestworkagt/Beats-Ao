@@ -14,9 +14,12 @@ O comando consulta `GET /beats` na Edge Function pública e gera o site em `dist
 
 - Copia os ficheiros necessários do site, `assets/`, domínio e verificação Google.
 - Gera `dist/beats/<slug>/index.html` para cada beat publicado recebido da API.
-- Injeta título, descrição, canonical, Open Graph e JSON-LD no HTML de cada beat.
+- Pré-renderiza título, artista, género, BPM, tonalidade, preço, descrição e licença no HTML.
+- Injeta title, description, canonical, Open Graph e JSON-LD.
+- Apresenta os formatos MP3/WAV no HTML apenas quando `available_formats` os confirma.
 - Acrescenta as URLs individuais ao `sitemap.xml`.
-- Não copia dados privados, passwords, tokens ou caminhos de downloads para o HTML.
+- Escapa conteúdo textual e não copia passwords, tokens, caminhos privados ou URLs de download para o HTML.
+- A página inicial contém o conteúdo já renderizado; o JavaScript atualiza dados de áudio, avaliações e disponibilidade em tempo real.
 - Falha se a API não responder com sucesso ou se existirem slugs duplicados.
 
 ## Variáveis opcionais
