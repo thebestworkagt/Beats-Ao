@@ -370,14 +370,26 @@
     }
 
     try {
-      const response = await API.get(`beat/${encodeURIComponent(slug)}`);
-      if (response.status === 404) {
-        showError('Beat não encontrado', 'Este beat pode ter sido removido, arquivado ou ainda não está publicado.');
-        return;
+      const embeddedData = $('#beatPageData');
+      if (embeddedData) {
+        try {
+          const parsed = JSON.parse(embeddedData.textContent || '{}');
+          if (parsed && parsed.slug === slug && parsed.id) beat = parsed;
+        } catch {
+          beat = null;
+        }
       }
-      if (!response.ok) throw new Error('Não foi possível carregar os detalhes do beat.');
 
-      beat = await response.json();
+      if (!beat) {
+        const response = await API.get(`beat/${encodeURIComponent(slug)}`);
+        if (response.status === 404) {
+          showError('Beat não encontrado', 'Este beat pode ter sido removido, arquivado ou ainda não está publicado.');
+          return;
+        }
+        if (!response.ok) throw new Error('Não foi possível carregar os detalhes do beat.');
+        beat = await response.json();
+      }
+
       if (!beat || !beat.id || beat.slug !== slug) {
         showError('Beat não encontrado', 'Não foi possível confirmar este beat.');
         return;
