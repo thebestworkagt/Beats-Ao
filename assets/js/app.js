@@ -452,20 +452,29 @@
       const downloadDiv = document.createElement('div');
       downloadDiv.className = 'download-buttons';
       
-      const mp3Btn = document.createElement('button');
-      mp3Btn.className = 'btn-download btn-mp3';
-      mp3Btn.innerHTML = '<i class="fas fa-file-audio"></i> MP3';
-      mp3Btn.dataset.format = 'mp3';
-      mp3Btn.dataset.beatId = beat.id;
-      
-      const wavBtn = document.createElement('button');
-      wavBtn.className = 'btn-download btn-wav';
-      wavBtn.innerHTML = '<i class="fas fa-file-audio"></i> WAV';
-      wavBtn.dataset.format = 'wav';
-      wavBtn.dataset.beatId = beat.id;
-      
-      downloadDiv.appendChild(mp3Btn);
-      downloadDiv.appendChild(wavBtn);
+      const availableFormats = beat.available_formats || {};
+
+      const mp3Btn = availableFormats.mp3 === true
+        ? document.createElement('button')
+        : null;
+      if (mp3Btn) {
+        mp3Btn.className = 'btn-download btn-mp3';
+        mp3Btn.innerHTML = '<i class="fas fa-file-audio"></i> MP3';
+        mp3Btn.dataset.format = 'mp3';
+        mp3Btn.dataset.beatId = beat.id;
+        downloadDiv.appendChild(mp3Btn);
+      }
+
+      const wavBtn = availableFormats.wav === true
+        ? document.createElement('button')
+        : null;
+      if (wavBtn) {
+        wavBtn.className = 'btn-download btn-wav';
+        wavBtn.innerHTML = '<i class="fas fa-file-audio"></i> WAV';
+        wavBtn.dataset.format = 'wav';
+        wavBtn.dataset.beatId = beat.id;
+        downloadDiv.appendChild(wavBtn);
+      }
       
       // AÇÕES
       const actionsDiv = document.createElement('div');
@@ -531,7 +540,7 @@
       infoDiv.appendChild(metaDiv);
       infoDiv.appendChild(exclusivo);
       infoDiv.appendChild(statsDiv);
-      infoDiv.appendChild(downloadDiv);
+      if (mp3Btn || wavBtn) infoDiv.appendChild(downloadDiv);
       infoDiv.appendChild(actionsDiv);
       
       card.appendChild(playerWrapper);
@@ -555,17 +564,21 @@
       });
 
       // DOWNLOAD
-      mp3Btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        openPasswordModal(beat.id, 'mp3');
-      });
+      if (mp3Btn) {
+        mp3Btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openPasswordModal(beat.id, 'mp3');
+        });
+      }
 
-      wavBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        openPasswordModal(beat.id, 'wav');
-      });
+      if (wavBtn) {
+        wavBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openPasswordModal(beat.id, 'wav');
+        });
+      }
 
       return card;
     }
