@@ -26,6 +26,13 @@
 8. Preparação para compras, encomendas, pagamentos e licenças, sem presumir que um pagamento foi confirmado só pelo frontend.
 9. Arquitetura extensível para permitir novas opções no painel sem alterações manuais ao código sempre que possível.
 
+## Preparação de páginas individuais
+
+- Criada a especificação de URL e routing em `docs/ROTAS-E-PAGINAS-BEATS.md`.
+- Criado o contrato de allowlist da API em `docs/API-PUBLICA-BEATS.md`.
+- Preparada migração aditiva `20261119000000_add_beat_detail_fields.sql`; não aplicada à base de dados.
+- A implementação final da página depende do endpoint seguro e da decisão de alojamento/routing.
+
 ## Riscos confirmados na auditoria inicial
 
 - A rota pública `GET /beats` usa `.select('*')`, incluindo potencialmente `password` e URLs de download.
