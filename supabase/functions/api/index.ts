@@ -125,6 +125,16 @@ async function readJson(req: Request): Promise<Record<string, unknown>> {
   return parsed as Record<string, unknown>
 }
 
+function isOptionalHttpsUrl(value: unknown): boolean {
+  if (value === null || value === undefined || value === '') return true
+  if (typeof value !== 'string' || value.length > 2048) return false
+  try {
+    return new URL(value).protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
 function positiveInteger(value: unknown): number | null {
   const number = typeof value === 'number' ? value : Number(value)
   return Number.isSafeInteger(number) && number > 0 ? number : null
@@ -428,6 +438,11 @@ Deno.serve(async (req: Request) => {
             payload.price === undefined || !Number.isFinite(Number(payload.price)) || Number(payload.price) < 0) {
           return jsonResponse({ error: 'Invalid required beat fields' }, 400, origin);
         }
+        for (const field of ['cover', 'audio', 'audio_download_mp3', 'audio_download_wav'] as const) {
+          if (!isOptionalHttpsUrl(payload[field])) {
+            return jsonResponse({ error: `Invalid HTTPS URL: ${field}` }, 400, origin)
+          }
+        }
         payload.title = (payload.title as string).trim();
         payload.artist = (payload.artist as string).trim();
         payload.genre = (payload.genre as string).trim();
@@ -453,6 +468,11 @@ Deno.serve(async (req: Request) => {
           if (Object.prototype.hasOwnProperty.call(body, field)) payload[field] = body[field];
         }
         if (Object.keys(payload).length === 0) return jsonResponse({ error: 'No editable fields supplied' }, 400, origin);
+        for (const field of ['cover', 'audio', 'audio_download_mp3', 'audio_download_wav'] as const) {
+          if (field in payload && !isOptionalHttpsUrl(payload[field])) {
+            return jsonResponse({ error: `Invalid HTTPS URL: ${field}` }, 400, origin)
+          }
+        }
         if ('price' in payload && (!Number.isFinite(Number(payload.price)) || Number(payload.price) < 0)) {
           return jsonResponse({ error: 'Invalid price' }, 400, origin);
         }
