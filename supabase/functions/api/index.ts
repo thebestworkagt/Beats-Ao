@@ -1,13 +1,24 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
-const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+const secretKeysRaw = Deno.env.get('SUPABASE_SECRET_KEYS') ?? ''
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment configuration')
+let secretKeys: Record<string, string>
+try {
+  secretKeys = JSON.parse(secretKeysRaw) as Record<string, string>
+} catch {
+  throw new Error('Invalid Supabase secret-key configuration')
 }
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+const supabaseSecretKey = secretKeys.default
+
+if (!supabaseUrl || !supabaseSecretKey) {
+  throw new Error('Missing Supabase server configuration')
+}
+
+// Este cliente privilegiado só existe no servidor da Edge Function.
+// Nunca copiar SUPABASE_SECRET_KEYS ou a chave obtida daqui para o frontend.
+const supabase = createClient(supabaseUrl, supabaseSecretKey, {
   auth: {
     persistSession: false,
     autoRefreshToken: false,
