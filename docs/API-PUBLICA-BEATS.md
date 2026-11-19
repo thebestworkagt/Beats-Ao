@@ -58,7 +58,8 @@ Migrações automáticas preparadas em `supabase/migrations/20261119000000_add_b
 
 1. Aplicar as três migrações automáticas numa base de teste e validar o bucket privado.
 2. Copiar os downloads comerciais para `beat-downloads`, preencher os caminhos e remover apenas os objetos comerciais antigos do bucket público, sem tocar nos previews.
-3. Publicar uma versão de preview da função e validar que não devolve URLs privados nem passwords.
-4. Executar manualmente `supabase/manual/restrict_direct_table_access.sql` e testar a API novamente.
-5. Escolher e configurar o mecanismo de routing/geração de páginas compatível com o alojamento.
-6. Confirmar o comportamento para slugs inválidos, beats não publicados e refresh em URL direto.
+3. Executar `supabase/manual/lock_public_audios_writes.sql` depois de confirmar que nenhum fluxo legítimo depende dos uploads públicos.
+4. Publicar uma versão de preview da função e validar que não devolve URLs privados nem passwords.
+5. Executar manualmente `supabase/manual/restrict_direct_table_access.sql` e testar a API novamente.
+6. Escolher e configurar o mecanismo de routing/geração de páginas compatível com o alojamento.
+7. Confirmar o comportamento para slugs inválidos, beats não publicados e refresh em URL direto.
