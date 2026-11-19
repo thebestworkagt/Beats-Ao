@@ -21,7 +21,7 @@ supabase/
 
 As três migrações automáticas ainda não foram aplicadas.
 
-O endurecimento de grants foi separado para `manual/restrict_direct_table_access.sql`. Este script não é executado automaticamente pelo Supabase CLI: deve ser aplicado manualmente depois da Edge Function nova estar publicada e testada.
+O endurecimento de grants foi separado para `manual/restrict_direct_table_access.sql`. O bloqueio de alterações dos clientes no bucket de previews está em `manual/lock_public_audios_writes.sql`. Estes scripts não são executados automaticamente pelo Supabase CLI.
 
 ## Ordem obrigatória de publicação
 
@@ -33,10 +33,11 @@ A ordem abaixo evita interromper a API antiga antes de a versão privilegiada es
 4. Antes de remover objetos antigos do bucket público `audios`, confirmar que cada preview continua a usar o URL antigo e que cada download foi copiado e testado no bucket privado. Só depois remover os antigos objetos comerciais.
 5. Publicar `functions/api/index.ts`; confirmar que a função lê `SUPABASE_SECRET_KEYS` no runtime.
 6. Testar `GET /beats`, `GET /beat/:slug`, `GET /ratings`, `POST /play`, `POST /rate` e `POST /download` num beat de teste. Confirmar que o link assinado expira e que não existe acesso anónimo ao bucket privado.
-7. Só depois executar manualmente `manual/restrict_direct_table_access.sql`, testar as consultas diretas com a chave pública e repetir os testes da Edge Function.
-8. Publicar o frontend que lê `available_formats`; testar MP3, WAV e beat sem ficheiros disponíveis.
+7. Depois de migrar os ficheiros comerciais, executar `manual/lock_public_audios_writes.sql` para bloquear INSERT/UPDATE/DELETE dos clientes no bucket `audios` sem impedir a leitura pública dos previews.
+8. Só depois de a nova Edge Function estar publicada e testada, executar manualmente `manual/restrict_direct_table_access.sql`; testar que consultas diretas às tabelas falham com a chave pública e repetir os testes da API.
+9. Publicar o frontend que lê `available_formats`; testar MP3, WAV e beat sem ficheiros disponíveis.
 
-**Não aplicar o passo 7 antes do passo 5 e da validação do passo 6.** A revogação foi separada das migrações automáticas para impedir que um `db push` execute-a antes da nova API. Não tornar o bucket antigo `audios` privado sem separar primeiro os previews, pois a reprodução pública pode parar.
+**Não aplicar o passo 8 antes do passo 5 e da validação do passo 6.** A revogação de grants foi separada das migrações automáticas para impedir que um `db push` a execute antes da nova API. O script do bucket `audios` mantém a leitura pública; não tornar o bucket inteiro privado sem separar primeiro os previews, pois a reprodução pode parar.
 
 ## Edge Function versionada
 
@@ -65,7 +66,7 @@ O candidato está em `functions/api/index.ts`. Mantém os caminhos utilizados pe
 - Não existe ainda autenticação administrativa nem CRUD de beats.
 - CORS não é autenticação e não impede chamadas diretas fora do navegador.
 - O script manual para revogar grants diretos está preparado, mas não aplicado; as policies RLS antigas permanecem e devem ser revistas após restringir os grants.
-- O bucket `audios` continua público, com políticas antigas permissivas. É mantido assim para não quebrar previews; os downloads antigos continuam expostos até migração de objetos. Não remover nem tornar o bucket privado antes do inventário.
+- O bucket `audios` continua público. O script `manual/lock_public_audios_writes.sql` limita alterações dos clientes, mas a leitura permanece pública; os downloads antigos continuam expostos até migração dos objetos e remoção dos ficheiros comerciais antigos. Não tornar o bucket privado antes do inventário.
 - Até corrigir o Storage, não se deve tratar um URL de ficheiro como protegido só por não o devolver no catálogo.
 
 Nunca guardar valores de secrets neste repositório. A chave secreta padrão é injetada no runtime Supabase através de `SUPABASE_SECRET_KEYS`; a função lê `default`. Consultar a documentação oficial de [Environment variables](https://supabase.com/docs/guides/functions/secrets).
