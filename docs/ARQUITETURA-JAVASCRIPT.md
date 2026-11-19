@@ -40,12 +40,15 @@ assets/js/
 
 Os módulos são carregados antes de `app.js` em `index.html`. O ficheiro principal já delega as operações básicas destas áreas aos respetivos módulos, mas continua responsável pela ligação à interface e por várias regras de apresentação.
 
-## Página individual e geração estática
+## Página individual e Cloudflare Pages
 
-- `features/beat-detail-page.js` controla a página servida em `404.html` e as páginas estáticas geradas; carrega o detalhe por slug, player de preview, download, avaliação, carrinho, partilha e relacionados.
-- `scripts/generate-beat-pages.mjs` gera `dist/beats/<slug>/index.html`, pré-renderiza os dados públicos, metadados e JSON-LD e atualiza o sitemap.
+- `functions/beats/[slug].js` resolve `/beats/:slug`, consulta a API Supabase e devolve HTML pré-renderizado com HTTP 200.
+- `functions/sitemap.xml.js` constrói `/sitemap.xml` a partir do catálogo público.
+- `_routes.json` limita as invocações das Functions a `/beats/*` e `/sitemap.xml`; o catálogo e os assets permanecem estáticos.
+- `404.html` é o template HTML que a Function transforma, não o mecanismo de routing.
+- `features/beat-detail-page.js` hidrata os dados públicos embutidos no HTML e liga preview, download, avaliação, carrinho, partilha e relacionados.
+- `scripts/generate-beat-pages.mjs` permanece como ferramenta opcional de exportação estática; não é exigido pela rota Cloudflare.
 - O link de detalhe e a partilha no `app.js` usam `/beats/<slug>/`.
-- O fallback `404.html` mantém o URL no navegador, mas no GitHub Pages responde HTTP 404; a geração estática fornece ficheiros próprios com HTTP 200 quando o diretório `dist` for publicado.
 
 ## Responsabilidades ainda concentradas em app.js
 
@@ -82,4 +85,4 @@ Existem dois contextos distintos de reprodução: o áudio individual de cada ca
 
 ## Validação pendente
 
-As verificações incluíram sintaxe dos scripts, correspondência dos IDs entre HTML e JavaScript, pré-renderização com dados de teste contendo HTML malicioso e verificação dos metadados/formatos gerados. Ainda não há teste real no navegador, build com o endpoint Supabase publicado, teste HTTP das rotas ou execução na configuração GitHub Pages. Não declarar a aplicação integralmente funcional até executar esses testes.
+As verificações incluíram sintaxe das Pages Functions, correspondência dos IDs entre HTML e JavaScript, teste simulado do endpoint de detalhe (HTTP 200 e 404), pré-renderização com dados de teste contendo HTML malicioso, dados embutidos sem campos privados e geração do sitemap. Ainda falta um deployment de preview no Cloudflare Pages e teste contra a Edge Function Supabase publicada. Não declarar a aplicação integralmente funcional até executar esses testes.
