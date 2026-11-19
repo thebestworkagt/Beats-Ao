@@ -25,7 +25,7 @@ END;
 $$;
 
 REVOKE ALL ON FUNCTION public.increment_beat_plays(bigint) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION public.increment_beat_plays(bigint) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.increment_beat_plays(bigint) TO service_role;
 
 COMMENT ON FUNCTION public.increment_beat_plays(bigint) IS
   'Incrementa atomicamente a contagem de plays de um beat publicado.';
