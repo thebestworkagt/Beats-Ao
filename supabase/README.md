@@ -1,6 +1,6 @@
 # Supabase
 
-Esta pasta será a fonte versionada do backend e da base de dados.
+Esta pasta contém a versão candidata e versionada do backend e as migrações SQL do projeto.
 
 Estrutura prevista:
 
@@ -15,20 +15,34 @@ supabase/
 
 ## Migrações preparadas
 
-- `migrations/20261119000000_add_beat_detail_fields.sql`: adiciona descrição, resumo/termos de licença e estado de publicação, sem apagar ou reescrever os campos atuais. Ainda não foi aplicada.
+- `migrations/20261119000000_add_beat_detail_fields.sql`: adiciona descrição, resumo/termos de licença e estado de publicação.
+- `migrations/20261119010000_atomic_beat_plays.sql`: cria incremento atómico de reproduções para beats publicados.
 
-## Estado
+As duas migrações ainda não foram aplicadas.
 
-O código atualmente publicado da Edge Function `api` foi copiado pelo proprietário para a conversa e analisado, mas ainda não foi validado como versão canónica nem migrado para este repositório.
+## Edge Function versionada
 
-**Não publicar uma cópia desse código sem corrigir os problemas de segurança identificados.** A versão atual seleciona todas as colunas de `beats`, incluindo campos que não devem ser públicos, e usa uma comparação direta de palavra-passe para autorizar downloads.
+O candidato está em `functions/api/index.ts`. Mantém os caminhos utilizados pelo frontend e acrescenta `GET /beat/:slug`.
 
-Antes de adicionar a função aqui:
+**Ainda não foi publicado no Supabase.** Depende das duas migrações acima e da validação em ambiente de teste. Não copiar para produção antes de rever os pontos pendentes abaixo.
 
-1. Confirmar a versão exata que está publicada no projeto Supabase.
-2. Criar uma versão corrigida, com autorização no servidor.
-3. Identificar secrets necessários; guardar os valores apenas no Supabase.
-4. Preparar migrações não destrutivas e validar em ambiente de teste.
-5. Publicar apenas depois de testes e aprovação.
+### Melhorias incluídas
+
+- `GET /beats` usa uma lista explícita de colunas e filtra apenas beats publicados.
+- `GET /beat/:slug` devolve um único beat publicado.
+- Os campos de password e URLs de download não são incluídos em respostas públicas.
+- `available_formats` informa apenas se MP3/WAV estão disponíveis.
+- `GET /ratings` devolve apenas `beat_id` e `rating`, nunca `user_id`.
+- `POST /play` utiliza função SQL atómica.
+- Validação básica de IDs, notas, formatos e tamanho do corpo.
+- CORS limitado aos domínios configurados no código.
+
+### Riscos que permanecem
+
+- `POST /rate` continua anónimo e não tem limitação persistente de frequência; a identidade fornecida pelo browser não é aceite como prova de identidade.
+- `POST /download` continua a comparar uma password guardada em texto simples e a devolver o URL de download após a validação. É compatibilidade temporária, não autorização comercial robusta.
+- Não existe ainda autenticação administrativa nem CRUD de beats.
+- CORS não é autenticação e não impede chamadas diretas fora do navegador.
+- A auditoria anterior identificou grants, políticas RLS e bucket Storage excessivamente permissivos; continuam por corrigir.
 
 Nunca guardar valores de secrets neste repositório.
