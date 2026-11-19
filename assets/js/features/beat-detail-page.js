@@ -319,12 +319,28 @@
     });
 
     elements.shareButton.addEventListener('click', async () => {
+      const shareUrl = window.location.href;
       try {
-        await navigator.clipboard.writeText(window.location.href);
-        showNotice('Link do beat copiado.');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(shareUrl);
+          showNotice('Link do beat copiado.');
+          return;
+        }
       } catch {
-        showNotice(window.location.href);
+        // Continua para o método de cópia compatível com navegadores mais antigos.
       }
+
+      const textArea = document.createElement('textarea');
+      textArea.value = shareUrl;
+      textArea.setAttribute('readonly', '');
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+      let copied = false;
+      try { copied = document.execCommand('copy'); } catch { copied = false; }
+      document.body.removeChild(textArea);
+      showNotice(copied ? 'Link do beat copiado.' : shareUrl, !copied);
     });
 
     elements.negotiateButton.href = `https://wa.me/244926261011?text=${encodeURIComponent(`Olá! Gostaria de negociar o beat "${beat.title}" de ${beat.artist}.`)}`;
