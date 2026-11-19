@@ -31,7 +31,7 @@ As opções são:
 
 ## Contrato de dados
 
-A resposta pública deve limitar-se a uma allowlist definida em `docs/API-PUBLICA-BEATS.md`. O modelo de dados recebeu uma migração aditiva preparada em `supabase/migrations/20261119000000_add_beat_detail_fields.sql`, que acrescenta descrição, resumo/termos de licença e estado de publicação. A migração ainda não foi aplicada.
+A resposta pública deve limitar-se a uma allowlist definida em `docs/API-PUBLICA-BEATS.md`. O modelo de dados recebeu uma migração aditiva preparada em `supabase/migrations/20261119000000_add_beat_detail_fields.sql`, que acrescenta descrição, resumo/termos de licença e estado de publicação. As migrações ainda não foram aplicadas. O candidato de API já está versionado em `supabase/functions/api/index.ts`, mas não foi publicado.
 
 ## Recomendação
 
