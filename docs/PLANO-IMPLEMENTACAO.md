@@ -6,13 +6,13 @@
 - Branch de produção: `main`
 - Branch de trabalho: `hardening/admin-foundation`
 - O repositório contém atualmente uma página `index.html`, imagens, CNAME e sitemap.
-- Não existe código Supabase/Edge Function versionado neste repositório.
+- Existe uma versão candidata da Edge Function em `supabase/functions/api/index.ts`; ainda não está publicada no projeto Supabase.
 - O `index.html` atual chama a Edge Function pública em `/functions/v1/api`.
 - O painel administrativo está desativado no frontend: login/logout apenas mostram a mensagem "Admin desativado"; a eliminação de beats também está desativada.
 - O frontend força `isLoggedIn = false` e `currentUser = null` durante a inicialização.
-- A página pública carrega `/beats`, que no código da função atualmente seleciona todas as colunas da tabela.
-- A página cria sempre os dois botões de download MP3 e WAV, mesmo quando o link correspondente está vazio.
-- O código da Edge Function fornecido pelo proprietário ainda não está versionado no repositório.
+- A versão atualmente publicada da função foi observada a usar `/beats` com `.select('*')`; o candidato versionado substitui isso por uma allowlist.
+- O candidato do frontend mostra MP3/WAV apenas quando `available_formats` confirma disponibilidade; depende da nova Edge Function.
+- A Edge Function candidata está versionada, mas requer as duas migrações SQL e testes antes de publicação.
 
 ## Requisitos funcionais recolhidos
 
@@ -29,6 +29,9 @@
 ## Preparação de páginas individuais
 
 - Criada a especificação de URL e routing em `docs/ROTAS-E-PAGINAS-BEATS.md`.
+- Criada a função candidata `supabase/functions/api/index.ts` com catálogo por allowlist e consulta por slug.
+- Preparado incremento atómico de reproduções em `20261119010000_atomic_beat_plays.sql`; não aplicado.
+- Frontend passou a consumir `available_formats` para mostrar apenas os formatos existentes.
 - Criado o contrato de allowlist da API em `docs/API-PUBLICA-BEATS.md`.
 - Preparada migração aditiva `20261119000000_add_beat_detail_fields.sql`; não aplicada à base de dados.
 - A implementação final da página depende do endpoint seguro e da decisão de alojamento/routing.
@@ -47,9 +50,11 @@
 ### Fase 0 — preservar e estabelecer base
 - Trabalhar nesta branch isolada.
 - Manter `main` e produção inalterados até revisão e aprovação.
-- Versionar o código da Edge Function e as migrações SQL no repositório.
+- Versionar o código da Edge Function e as migrações SQL no repositório. (Candidato e migrações já estão versionados nesta branch.)
 
 ### Fase 1 — segurança e contrato da API
+- Rever e testar a Edge Function candidata antes da publicação.
+- Aplicar em ambiente de teste as migrações de campos públicos e contador atómico.
 - Definir autenticação administrativa no servidor.
 - Separar campos públicos de campos privados.
 - Remover segredos e URLs protegidas das respostas públicas.
