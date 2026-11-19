@@ -20,14 +20,15 @@ O diretório `functions/` deve permanecer na raiz do projeto Pages. O ficheiro `
 2. Em Settings → Builds & deployments, confirmar o repositório Git ligado e a branch de produção atualmente configurada.
 3. Confirmar o build output directory. O ficheiro `_routes.json` tem de estar nesse diretório; se a saída publicada for a raiz do repositório, o ficheiro atual já está no local esperado.
 4. Confirmar que a pasta `functions/` está na raiz do projeto Pages.
-5. Criar um deployment de preview a partir da branch `hardening/admin-foundation`, sem alterar a branch de produção.
-6. Confirmar que o preview executa as Pages Functions. Se o projeto tiver sido criado por Direct Upload, esse modo não suporta Pages Functions pelo dashboard; usar a integração Git ou Wrangler.
-7. Só depois de a Edge Function Supabase estar publicada e testada, verificar:
+5. Em Branch control, manter `main` como Production branch e incluir `hardening/admin-foundation` nas Preview branches.
+6. Um novo commit na branch `hardening/admin-foundation` deve iniciar um deployment de preview. O preview não altera a branch nem o deployment de produção.
+7. Confirmar que o preview executa as Pages Functions. Se o projeto tiver sido criado por Direct Upload, esse modo não suporta Pages Functions pelo dashboard; usar a integração Git ou Wrangler.
+8. Só depois de a Edge Function Supabase estar publicada e testada, verificar:
    - `GET /beats/<slug>/` → HTTP 200 e HTML com title/canonical/Open Graph.
    - `GET /beats/slug-inexistente/` → HTTP 404 e `noindex`.
    - `GET /sitemap.xml` → XML com apenas beats publicados.
    - CSS, JavaScript, imagens e página inicial continuam a ser servidos como assets estáticos.
-8. Rever logs das Functions e testar no browser (desktop e telemóvel). Só depois promover a alteração para produção.
+9. Rever logs das Functions e testar no browser (desktop e telemóvel). Só depois promover a alteração para produção.
 
 ## Variáveis opcionais
 
@@ -52,5 +53,5 @@ Referências oficiais:
 
 - A rota depende de `GET /beat/:slug` na nova Edge Function Supabase. Essa versão ainda não foi publicada.
 - As migrações Supabase continuam por aplicar.
-- Não foi possível verificar as definições reais do dashboard Cloudflare nem criar um deployment de preview a partir desta sessão.
+- Não foi possível verificar as definições reais do dashboard Cloudflare nem confirmar um deployment de preview.
 - A branch `main` e o deployment de produção não foram alterados.
