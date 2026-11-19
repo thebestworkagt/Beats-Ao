@@ -31,6 +31,8 @@
 - Criada a especificação de URL e routing em `docs/ROTAS-E-PAGINAS-BEATS.md`.
 - Criada a função candidata `supabase/functions/api/index.ts` com catálogo por allowlist e consulta por slug.
 - Preparado incremento atómico de reproduções em `20261119010000_atomic_beat_plays.sql`; não aplicado.
+- Preparado bucket privado `beat-downloads` e campos de caminho em `20261119030000_private_beat_downloads.sql`; não aplicado.
+- API candidata agora cria URLs assinados de 120 segundos para caminhos privados e já não lê os antigos URLs de download.
 - Preparada revogação dos grants diretos `anon`/`authenticated` em `20261119020000_restrict_direct_table_access.sql`; não aplicada.
 - Edge Function passou a usar `SUPABASE_SECRET_KEYS` apenas no servidor, para permitir retirar o acesso direto do browser às tabelas.
 - Frontend passou a consumir `available_formats` para mostrar apenas os formatos existentes.
