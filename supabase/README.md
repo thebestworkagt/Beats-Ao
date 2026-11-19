@@ -17,26 +17,26 @@ supabase/
 
 - `migrations/20261119000000_add_beat_detail_fields.sql`: adiciona descrição, resumo/termos de licença e estado de publicação.
 - `migrations/20261119010000_atomic_beat_plays.sql`: cria incremento atómico de reproduções para beats publicados e limita a RPC ao backend.
-- `migrations/20261119020000_restrict_direct_table_access.sql`: revoga o acesso direto de `anon` e `authenticated` às tabelas internas.
 - `migrations/20261119030000_private_beat_downloads.sql`: cria o bucket privado `beat-downloads`, acrescenta colunas de caminhos de ficheiros e bloqueia acesso de browser ao novo bucket.
 
-As quatro migrações ainda não foram aplicadas.
+As três migrações automáticas ainda não foram aplicadas.
+
+O endurecimento de grants foi separado para `manual/restrict_direct_table_access.sql`. Este script não é executado automaticamente pelo Supabase CLI: deve ser aplicado manualmente depois da Edge Function nova estar publicada e testada.
 
 ## Ordem obrigatória de publicação
 
 A ordem abaixo evita interromper a API antiga antes de a versão privilegiada estar ativa:
 
 1. Fazer backup e testar numa instância de desenvolvimento.
-2. Aplicar `20261119000000_add_beat_detail_fields.sql` e `20261119010000_atomic_beat_plays.sql`.
-3. Aplicar `20261119030000_private_beat_downloads.sql` para criar o bucket privado e as colunas de caminhos.
-4. Copiar cada ficheiro comercial MP3/WAV para `beat-downloads`, usando `beats/<id>/mp3/<nome>.mp3` e `beats/<id>/wav/<nome>.wav`; preencher `download_mp3_path` e `download_wav_path` com caminhos relativos.
-5. Antes de remover objetos antigos do bucket público `audios`, confirmar que cada preview ainda usa o URL antigo e que cada download foi copiado e testado no bucket privado. Só depois remover os antigos objetos comerciais.
-6. Publicar `functions/api/index.ts`; confirmar que a função lê `SUPABASE_SECRET_KEYS` no runtime.
-7. Testar `GET /beats`, `GET /beat/:slug`, `GET /ratings`, `POST /play`, `POST /rate` e `POST /download` num beat de teste. Confirmar que o link assinado expira e que não existe acesso anónimo ao bucket privado.
-8. Só depois aplicar `20261119020000_restrict_direct_table_access.sql`, testar as consultas diretas com a chave pública e repetir os testes da Edge Function.
-9. Publicar o frontend que lê `available_formats`; testar MP3, WAV e beat sem ficheiros disponíveis.
+2. Aplicar as três migrações automáticas em ordem: `20261119000000_add_beat_detail_fields.sql`, `20261119010000_atomic_beat_plays.sql` e `20261119030000_private_beat_downloads.sql`.
+3. Copiar cada ficheiro comercial MP3/WAV para `beat-downloads`, usando `beats/<id>/mp3/<nome>.mp3` e `beats/<id>/wav/<nome>.wav`; preencher `download_mp3_path` e `download_wav_path` com caminhos relativos.
+4. Antes de remover objetos antigos do bucket público `audios`, confirmar que cada preview continua a usar o URL antigo e que cada download foi copiado e testado no bucket privado. Só depois remover os antigos objetos comerciais.
+5. Publicar `functions/api/index.ts`; confirmar que a função lê `SUPABASE_SECRET_KEYS` no runtime.
+6. Testar `GET /beats`, `GET /beat/:slug`, `GET /ratings`, `POST /play`, `POST /rate` e `POST /download` num beat de teste. Confirmar que o link assinado expira e que não existe acesso anónimo ao bucket privado.
+7. Só depois executar manualmente `manual/restrict_direct_table_access.sql`, testar as consultas diretas com a chave pública e repetir os testes da Edge Function.
+8. Publicar o frontend que lê `available_formats`; testar MP3, WAV e beat sem ficheiros disponíveis.
 
-**Nunca executar o passo 8 antes do passo 6 e da validação do passo 7.** Caso contrário, a função antiga, que usa a chave pública, pode perder acesso às tabelas. Não tornar o bucket antigo `audios` privado sem separar primeiro os previews, pois a reprodução pública pode parar.
+**Não aplicar o passo 7 antes do passo 5 e da validação do passo 6.** A revogação foi separada das migrações automáticas para impedir que um `db push` execute-a antes da nova API. Não tornar o bucket antigo `audios` privado sem separar primeiro os previews, pois a reprodução pública pode parar.
 
 ## Edge Function versionada
 
@@ -64,7 +64,7 @@ O candidato está em `functions/api/index.ts`. Mantém os caminhos utilizados pe
 - O URL assinado de 120 segundos não pode ser revogado individualmente após emissão; renomear, mover ou apagar o objeto invalida o caminho original, mas os links emitidos podem continuar funcionais até a expiração/cache.
 - Não existe ainda autenticação administrativa nem CRUD de beats.
 - CORS não é autenticação e não impede chamadas diretas fora do navegador.
-- A migração para revogar grants diretos está preparada, mas não aplicada; as permissões RLS antigas permanecem no SQL e devem ser revistas após restringir os grants.
+- O script manual para revogar grants diretos está preparado, mas não aplicado; as policies RLS antigas permanecem e devem ser revistas após restringir os grants.
 - O bucket `audios` continua público, com políticas antigas permissivas. É mantido assim para não quebrar previews; os downloads antigos continuam expostos até migração de objetos. Não remover nem tornar o bucket privado antes do inventário.
 - Até corrigir o Storage, não se deve tratar um URL de ficheiro como protegido só por não o devolver no catálogo.
 
