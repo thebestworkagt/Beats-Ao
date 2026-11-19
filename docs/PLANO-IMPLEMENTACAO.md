@@ -30,6 +30,9 @@
 
 - Criada a especificação de URL e routing em `docs/ROTAS-E-PAGINAS-BEATS.md`.
 - Criada a função candidata `supabase/functions/api/index.ts` com catálogo por allowlist e consulta por slug.
+- Implementado `404.html` como fallback transitório e `assets/js/features/beat-detail-page.js` para detalhes por slug.
+- Implementados links de detalhe nos cards e URLs de partilha `/beats/<slug>/`.
+- Criado o gerador `scripts/generate-beat-pages.mjs`, que pré-renderiza `dist/beats/<slug>/index.html` com metadados e sitemap.
 - Preparado incremento atómico de reproduções em `20261119010000_atomic_beat_plays.sql`; não aplicado.
 - Preparado bucket privado `beat-downloads` e campos de caminho em `20261119030000_private_beat_downloads.sql`; não aplicado.
 - API candidata agora cria URLs assinados de 120 segundos para caminhos privados e já não lê os antigos URLs de download.
