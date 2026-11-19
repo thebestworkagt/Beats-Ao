@@ -31,14 +31,16 @@ Plataforma de beats. Este repositório está a ser reorganizado por camadas para
 - Estrutura e conteúdo HTML: `index.html`.
 - Aparência e estilos: `assets/css/main.css`.
 - Comportamento do catálogo: `assets/js/app.js`.
-- Página individual: `assets/js/features/beat-detail-page.js` e `assets/css/beat-detail.css`.
+- Página individual: `functions/beats/[slug].js`, `assets/js/features/beat-detail-page.js` e `assets/css/beat-detail.css`.
+- Sitemap dinâmico: `functions/sitemap.xml.js`.
+- Rotas Cloudflare Pages: `_routes.json`.
 - Geração de páginas estáticas: `node scripts/generate-beat-pages.mjs`.
 - Requisitos e decisões técnicas: `docs/`.
 - Funções Edge e migrações SQL: `supabase/` (a organizar e versionar após validação).
 
 ## Publicação
 
-O site atual é publicado a partir da raiz do repositório. Por isso, `index.html`, `404.html`, `CNAME`, `sitemap.xml` e o ficheiro de verificação Google permanecem na raiz. Não alterar a pasta de publicação sem atualizar e testar a configuração do alojamento. O gerador estático prepara `dist/` com páginas individuais reais; a publicação desse artefacto por GitHub Actions ainda não foi configurada.
+O site é alojado no Cloudflare Pages; o GitHub mantém o código-fonte. O diretório `functions/` contém as rotas dinâmicas Cloudflare Pages Functions e `_routes.json` limita a sua invocação. `index.html`, `CNAME`, `sitemap.xml`, `404.html` e o ficheiro de verificação Google permanecem no diretório de publicação. A publicação deve continuar pelo fluxo atual do Cloudflare Pages, não por GitHub Pages.
 
 ## Regras para contribuições
 
@@ -51,4 +53,4 @@ O site atual é publicado a partir da raiz do repositório. Por isso, `index.htm
 
 ## Estado da reorganização
 
-A extração inicial do CSS/JavaScript, módulos básicos, players e primeira versão das páginas individuais foi feita na branch `hardening/admin-foundation`. A página detalhada e o gerador estão preparados, mas dependem da API nova no Supabase e da configuração de publicação por GitHub Actions para produzir páginas HTTP 200.
+A extração inicial do CSS/JavaScript, módulos básicos, players e primeira versão das páginas individuais foi feita na branch `hardening/admin-foundation`. As rotas dinâmicas Cloudflare Pages estão preparadas e devolvem HTML pré-renderizado; dependem da publicação da API nova no Supabase e de um deployment de preview do projeto Pages para validação real.
