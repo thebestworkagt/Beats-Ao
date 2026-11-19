@@ -36,7 +36,7 @@ A disponibilidade de formato é calculada no servidor a partir dos campos `downl
 
 O frontend não deve tentar inferir disponibilidade MP3/WAV a partir de URLs de ficheiros.
 
-O endpoint `POST /download` cria um URL assinado com validade de 120 segundos a partir do caminho privado guardado na linha do beat. O Supabase permite servir objetos de buckets privados por URLs assinados temporários; esses links podem continuar válidos até expirarem, mesmo depois de serem emitidos. <https://supabase.com/docs/guides/storage/serving/downloads>
+O endpoint `POST /download` cria um URL assinado com validade de 120 segundos a partir do caminho privado guardado na linha do beat. O Supabase permite servir objetos de buckets privados por URLs assinados temporários; esses links continuam válidos até expirarem e não podem ser revogados individualmente sem mover, renomear ou apagar o objeto. <Cite ref="turn851811search2" /> <https://supabase.com/docs/guides/storage/serving/downloads>
 
 **Limite importante:** a auditoria encontrou o bucket `audios` público. Retirar o URL da resposta do catálogo não torna privado um objeto que continua num bucket público. A migração de Storage precisa de inventariar o campo `audio` (preview) e os downloads para separar os dois tipos de ficheiro sem quebrar a reprodução.
 
@@ -52,12 +52,12 @@ O endpoint `POST /download` cria um URL assinado com validade de 120 segundos a 
 
 A tabela atual usa `price text`; não converter o tipo nesta migração. Os campos `description`, `license_summary`, `license_terms` e `status` são adicionados de forma aditiva. Os registos existentes passam a `published` por omissão para preservar a visibilidade atual.
 
-Migrações preparadas em `supabase/migrations/20261119000000_add_beat_detail_fields.sql`, `supabase/migrations/20261119010000_atomic_beat_plays.sql`, `supabase/migrations/20261119020000_restrict_direct_table_access.sql` e `supabase/migrations/20261119030000_private_beat_downloads.sql`. Ainda não foram aplicadas à base de dados. A última cria o bucket privado `beat-downloads` e os campos `download_mp3_path`/`download_wav_path`. A última revoga grants diretos de `anon`/`authenticated`; a Edge Function passa a usar a chave secreta no runtime. A Edge Function candidata está em `supabase/functions/api/index.ts`, mas ainda não foi publicada.
+Migrações preparadas em `supabase/migrations/20261119000000_add_beat_detail_fields.sql`, `supabase/migrations/20261119010000_atomic_beat_plays.sql`, `supabase/migrations/20261119020000_restrict_direct_table_access.sql` e `supabase/migrations/20261119030000_private_beat_downloads.sql`. Ainda não foram aplicadas à base de dados. A migração `20261119030000_private_beat_downloads.sql` cria o bucket privado `beat-downloads` e os campos `download_mp3_path`/`download_wav_path`. A migração `20261119020000_restrict_direct_table_access.sql` revoga os grants diretos de `anon`/`authenticated`; a Edge Function usa a chave secreta no runtime. A Edge Function candidata está em `supabase/functions/api/index.ts`, mas ainda não foi publicada.
 
 ## Bloqueios antes da página pública final
 
-1. Aplicar as três migrações numa base de teste, testar os acessos diretos com a chave pública e publicar uma versão de preview da função.
+1. Aplicar as quatro migrações numa base de teste e testar os acessos diretos com a chave pública.
 2. Copiar os downloads comerciais do bucket público `audios` para `beat-downloads`, preencher os caminhos nas colunas novas e remover os objetos comerciais antigos do bucket público, sem tocar nos previews.
-2. Validar que o endpoint não devolve URLs privados nem passwords.
-3. Escolher e configurar o mecanismo de routing/geração de páginas compatível com o alojamento.
-4. Confirmar o comportamento para slugs inválidos, beats não publicados e refresh em URL direto.
+3. Publicar uma versão de preview da função e validar que não devolve URLs privados nem passwords.
+4. Escolher e configurar o mecanismo de routing/geração de páginas compatível com o alojamento.
+5. Confirmar o comportamento para slugs inválidos, beats não publicados e refresh em URL direto.
