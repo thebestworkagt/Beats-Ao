@@ -13,6 +13,7 @@ function xmlEscape(value) {
 
 export async function onRequestGet({ request, env }) {
   const apiBaseUrl = (env.BEATS_API_BASE_URL || DEFAULT_API_URL).replace(/\/$/, '')
+  const siteOrigin = (env.BEATS_SITE_ORIGIN || SITE_ORIGIN).replace(/\/$/, '')
   try {
     const response = await fetch(`${apiBaseUrl}/beats`, {
       headers: { Accept: 'application/json' }
@@ -23,9 +24,9 @@ export async function onRequestGet({ request, env }) {
     if (!Array.isArray(beats)) throw new Error('Invalid catalog payload')
 
     const entries = new Map()
-    entries.set(SITE_ORIGIN + '/', [
+    entries.set(siteOrigin + '/', [
       '  <url>',
-      `    <loc>${SITE_ORIGIN}/</loc>`,
+      `    <loc>${xmlEscape(siteOrigin + '/') }</loc>`,
       `    <lastmod>${new Date().toISOString().slice(0, 10)}</lastmod>`,
       '    <changefreq>weekly</changefreq>',
       '    <priority>1.0</priority>',
@@ -34,7 +35,7 @@ export async function onRequestGet({ request, env }) {
 
     for (const beat of beats) {
       if (!beat || typeof beat.slug !== 'string' || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(beat.slug)) continue
-      const loc = `${SITE_ORIGIN}/beats/${encodeURIComponent(beat.slug)}/`
+      const loc = `${siteOrigin}/beats/${encodeURIComponent(beat.slug)}/`
       entries.set(loc, [
         '  <url>',
         `    <loc>${xmlEscape(loc)}</loc>`,
