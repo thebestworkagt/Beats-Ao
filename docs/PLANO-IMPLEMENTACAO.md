@@ -30,7 +30,10 @@
 
 - Criada a especificação de URL e routing em `docs/ROTAS-E-PAGINAS-BEATS.md`.
 - Criada a função candidata `supabase/functions/api/index.ts` com catálogo por allowlist e consulta por slug.
-- Implementado `404.html` como fallback transitório e `assets/js/features/beat-detail-page.js` para detalhes por slug.
+- Implementado `functions/beats/[slug].js` como Cloudflare Pages Function, devolvendo HTTP 200 e HTML pré-renderizado por slug.
+- Implementado `functions/sitemap.xml.js` para sitemap dinâmico.
+- Criado `_routes.json` para executar Functions apenas nas rotas de beats e sitemap.
+- Mantido `404.html` como template de HTML reutilizado pela Function; não é o mecanismo de routing.
 - Implementados links de detalhe nos cards e URLs de partilha `/beats/<slug>/`.
 - Criado o gerador `scripts/generate-beat-pages.mjs`, que pré-renderiza `dist/beats/<slug>/index.html` com metadados e sitemap.
 - Preparado incremento atómico de reproduções em `20261119010000_atomic_beat_plays.sql`; não aplicado.
@@ -45,7 +48,7 @@
 - Preparada migração aditiva `20261119000000_add_beat_detail_fields.sql`; não aplicada à base de dados.
 - Implementada uma página de detalhe por slug nesta branch, com fallback `404.html`, controlador e estilos.
 - Criado `scripts/generate-beat-pages.mjs` para gerar páginas estáticas com HTTP 200 e sitemap a partir da API pública.
-- Falta configurar/testar o workflow GitHub Pages por Actions; o fallback 404 é apenas transitório.
+- Falta fazer deployment de preview no Cloudflare Pages, confirmar a pasta de saída e testar a rota com API publicada.
 
 ## Riscos confirmados na auditoria inicial
 
