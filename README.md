@@ -20,6 +20,7 @@ Plataforma de beats. Este repositório está a ser reorganizado por camadas para
 ├── scripts/
 │   └── generate-beat-pages.mjs # Exportação estática opcional por slug
 ├── docs/
+│   ├── CONFIGURACAO-CLOUDFLARE-PAGES.md
 │   ├── BUILD-PAGINAS-ESTATICAS.md
 │   └── PLANO-IMPLEMENTACAO.md # Requisitos, riscos e fases de trabalho
 ├── supabase/
@@ -39,7 +40,7 @@ Plataforma de beats. Este repositório está a ser reorganizado por camadas para
 - Sitemap dinâmico: `functions/sitemap.xml.js`.
 - Rotas Cloudflare Pages: `_routes.json`.
 - Geração de páginas estáticas: `node scripts/generate-beat-pages.mjs`.
-- Requisitos e decisões técnicas: `docs/`.
+- Requisitos, arquitetura e publicação Cloudflare: `docs/`.
 - Funções Edge e migrações SQL: `supabase/` (a organizar e versionar após validação).
 
 ## Publicação
