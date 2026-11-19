@@ -1,5 +1,5 @@
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -7,6 +7,10 @@ const outputDir = resolve(projectRoot, process.env.DIST_DIR || 'dist')
 const apiBaseUrl = (process.env.BEATS_API_BASE_URL ||
   'https://bbghffltmiqcljuokbgz.supabase.co/functions/v1/api').replace(/\/$/, '')
 const siteOrigin = (process.env.BEATS_SITE_ORIGIN || 'https://beatsao.site').replace(/\/$/, '')
+const outputRelative = relative(projectRoot, outputDir)
+if (!outputRelative || outputRelative.startsWith('..') || isAbsolute(outputRelative)) {
+  throw new Error('DIST_DIR must be a child directory of the repository root.')
+}
 
 const publicFiles = [
   'index.html',
