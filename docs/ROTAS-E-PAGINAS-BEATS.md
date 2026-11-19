@@ -54,7 +54,7 @@ A sequência segura é:
 - Beats não publicados não podem ser expostos por URL direto.
 - Editar título não altera automaticamente o slug existente.
 - Alterar slug exige redirecionamento do endereço anterior ou manutenção de aliases.
-- A página pública nunca recebe password, credenciais, tokens nem URLs privados de download.
+- A página pública nunca recebe password, credenciais, tokens nem URLs de download. O Storage ainda precisa de migração: o bucket `audios` foi observado como público e não se pode assumir que URLs guardados nele sejam privados.
 - Os botões MP3 e WAV só aparecem quando o backend confirma que o formato está disponível; o backend continua a validar cada pedido.
 
 ## Estado
