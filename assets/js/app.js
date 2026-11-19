@@ -841,9 +841,10 @@
         audio: document.getElementById('fAudioStream').value.trim(),
         audio_download_mp3: document.getElementById('fAudioMp3').value.trim() || null,
         audio_download_wav: document.getElementById('fAudioWav').value.trim() || null,
-        password: document.getElementById('fPassword').value || null,
         status: document.getElementById('fStatus').value
       };
+      const downloadPassword = document.getElementById('fPassword').value;
+      if (downloadPassword) payload.password = downloadPassword;
       if (!payload.title || !payload.artist || !payload.genre || !payload.audio || !Number.isFinite(payload.price)) {
         showToast('Dados inválidos', 'Confere título, artista, género, preço e link de streaming.', 'error');
         return;
