@@ -12,6 +12,7 @@ assets/js/
   core/
     notifications.js
   features/
+    beat-detail-page.js
     cart.js
     card-player.js
     playlist-player.js
@@ -39,6 +40,13 @@ assets/js/
 
 Os módulos são carregados antes de `app.js` em `index.html`. O ficheiro principal já delega as operações básicas destas áreas aos respetivos módulos, mas continua responsável pela ligação à interface e por várias regras de apresentação.
 
+## Página individual e geração estática
+
+- `features/beat-detail-page.js` controla a página servida em `404.html` e as páginas estáticas geradas; carrega o detalhe por slug, player de preview, download, avaliação, carrinho, partilha e relacionados.
+- `scripts/generate-beat-pages.mjs` gera `dist/beats/<slug>/index.html`, pré-renderiza os dados públicos, metadados e JSON-LD e atualiza o sitemap.
+- O link de detalhe e a partilha no `app.js` usam `/beats/<slug>/`.
+- O fallback `404.html` mantém o URL no navegador, mas no GitHub Pages responde HTTP 404; a geração estática fornece ficheiros próprios com HTTP 200 quando o diretório `dist` for publicado.
+
 ## Responsabilidades ainda concentradas em app.js
 
 - Catálogo: carregamento, pesquisa, filtros e renderização dos cards.
@@ -57,8 +65,8 @@ Existem dois contextos distintos de reprodução: o áudio individual de cada ca
 
 1. Validar módulos já extraídos no navegador e corrigir inconsistências documentais.
 2. Testar os dois módulos de áudio no navegador, incluindo erros de carregamento, troca de card e encerramento.
-3. Definir o contrato de dados e a rota de detalhe individual de cada beat.
-4. Implementar páginas de beat com URL amigável e carregamento por slug.
+3. Definir o contrato de dados e a rota de detalhe individual de cada beat. (Preparado.)
+4. Implementar páginas de beat com URL amigável e carregamento por slug. (Primeira versão implementada.)
 5. Redesenhar os cards e a página individual com base no contrato definitivo.
 6. Separar catálogo, downloads e área administrativa.
 7. Automatizar testes e só depois avaliar integração na branch principal.
@@ -74,4 +82,4 @@ Existem dois contextos distintos de reprodução: o áudio individual de cada ca
 
 ## Validação pendente
 
-As verificações até agora são sobretudo inspeções estáticas do repositório. Ainda não há evidência de testes completos no navegador nem de testes de integração contra a API. Não declarar a aplicação integralmente funcional até executar esses testes.
+As verificações incluíram sintaxe dos scripts, correspondência dos IDs entre HTML e JavaScript, pré-renderização com dados de teste contendo HTML malicioso e verificação dos metadados/formatos gerados. Ainda não há teste real no navegador, build com o endpoint Supabase publicado, teste HTTP das rotas ou execução na configuração GitHub Pages. Não declarar a aplicação integralmente funcional até executar esses testes.
