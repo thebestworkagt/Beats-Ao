@@ -34,7 +34,8 @@
 - Preparado bucket privado `beat-downloads` e campos de caminho em `20261119030000_private_beat_downloads.sql`; não aplicado.
 - API candidata agora cria URLs assinados de 120 segundos para caminhos privados e já não lê os antigos URLs de download.
 - Preparado o script manual `supabase/manual/restrict_direct_table_access.sql` para revogar grants diretos `anon`/`authenticated`; ainda não aplicado.
-- Preparado o script manual `supabase/manual/lock_public_audios_writes.sql` para bloquear alterações públicas no bucket de previews sem bloquear leituras; ainda não aplicado. Foi retirado da pasta automática de migrações para não correr antes da publicação da nova API.
+- Preparado o script manual `supabase/manual/lock_public_audios_writes.sql` para bloquear alterações públicas no bucket de previews sem bloquear leituras; ainda não aplicado.
+- Criado `docs/MIGRACAO-STORAGE.md` com consultas de inventário, padrão de caminhos, teste de URLs assinados e sequência de remoção dos objetos públicos antigos. Foi retirado da pasta automática de migrações para não correr antes da publicação da nova API.
 - Edge Function passou a usar `SUPABASE_SECRET_KEYS` apenas no servidor, para permitir retirar o acesso direto do browser às tabelas.
 - Frontend passou a consumir `available_formats` para mostrar apenas os formatos existentes.
 - Criado o contrato de allowlist da API em `docs/API-PUBLICA-BEATS.md`.
