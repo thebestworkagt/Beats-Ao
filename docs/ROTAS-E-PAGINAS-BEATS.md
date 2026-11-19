@@ -29,6 +29,10 @@ As opções são:
 2. **Fallback SPA/404** — mantém o URL solicitado e deixa o JavaScript resolver o slug. É uma solução de transição, mas pode devolver estado HTTP 404 e prejudicar indexação/partilha por crawlers.
 3. **Alojamento com routing no servidor/edge** — Cloudflare Pages Functions ou Worker pode resolver `/beats/:slug` e devolver a página correta. Exige preparar e validar a migração do alojamento e DNS.
 
+## Contrato de dados
+
+A resposta pública deve limitar-se a uma allowlist definida em `docs/API-PUBLICA-BEATS.md`. O modelo de dados recebeu uma migração aditiva preparada em `supabase/migrations/20261119000000_add_beat_detail_fields.sql`, que acrescenta descrição, resumo/termos de licença e estado de publicação. A migração ainda não foi aplicada.
+
 ## Recomendação
 
 Não implementar a rota definitiva antes de corrigir o endpoint público do catálogo. Atualmente, a Edge Function descrita no projeto usa `select('*')` em `beats`, o que pode expor campos que nunca devem sair para visitantes, incluindo password e links de download protegidos.
