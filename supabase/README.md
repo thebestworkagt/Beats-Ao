@@ -33,13 +33,13 @@ A ordem abaixo evita interromper a API antiga antes de a versão privilegiada es
 
 1. Fazer backup e testar numa instância de desenvolvimento.
 2. Aplicar as três migrações automáticas em ordem: `20261119000000_add_beat_detail_fields.sql`, `20261119010000_atomic_beat_plays.sql` e `20261119030000_private_beat_downloads.sql`.
-3. Copiar cada ficheiro comercial MP3/WAV para `beat-downloads`, usando `beats/<id>/mp3/<nome>.mp3` e `beats/<id>/wav/<nome>.wav`; preencher `download_mp3_path` e `download_wav_path` com caminhos relativos.
-4. Antes de remover objetos antigos do bucket público `audios`, confirmar que cada preview continua a usar o URL antigo e que cada download foi copiado e testado no bucket privado. Só depois remover os antigos objetos comerciais.
-5. Publicar `functions/api/index.ts`; confirmar que a função lê `SUPABASE_SECRET_KEYS` no runtime.
-6. Testar `GET /beats`, `GET /beat/:slug`, `GET /ratings`, `POST /play`, `POST /rate` e `POST /download` num beat de teste. Confirmar que o link assinado expira e que não existe acesso anónimo ao bucket privado.
-7. Depois de migrar os ficheiros comerciais, executar `manual/lock_public_audios_writes.sql` para bloquear INSERT/UPDATE/DELETE dos clientes no bucket `audios` sem impedir a leitura pública dos previews.
-8. Só depois de a nova Edge Function estar publicada e testada, executar manualmente `manual/restrict_direct_table_access.sql`; testar que consultas diretas às tabelas falham com a chave pública e repetir os testes da API.
-9. Publicar o frontend que lê `available_formats`; testar MP3, WAV e beat sem ficheiros disponíveis.
+4. Copiar cada ficheiro comercial MP3/WAV para `beat-downloads`, usando `beats/<id>/mp3/<nome>.mp3` e `beats/<id>/wav/<nome>.wav`; preencher `download_mp3_path` e `download_wav_path` com caminhos relativos.
+5. Antes de remover objetos antigos do bucket público `audios`, confirmar que cada preview continua a usar o URL antigo e que cada download foi copiado e testado no bucket privado. Só depois remover os antigos objetos comerciais.
+6. Publicar `functions/api/index.ts`; confirmar que a função lê `SUPABASE_SECRET_KEYS` no runtime.
+7. Testar `GET /beats`, `GET /beat/:slug`, `GET /ratings`, `POST /play`, `POST /rate` e `POST /download` num beat de teste. Confirmar que o link assinado expira e que não existe acesso anónimo ao bucket privado.
+8. Depois de migrar os ficheiros comerciais, executar `manual/lock_public_audios_writes.sql` para bloquear INSERT/UPDATE/DELETE dos clientes no bucket `audios` sem impedir a leitura pública dos previews.
+9. Só depois de a nova Edge Function estar publicada e testada, executar manualmente `manual/restrict_direct_table_access.sql`; testar que consultas diretas às tabelas falham com a chave pública e repetir os testes da API.
+10. Publicar o frontend que lê `available_formats`; testar MP3, WAV e beat sem ficheiros disponíveis.
 
 **Não aplicar o passo 8 antes do passo 5 e da validação do passo 6.** A revogação de grants foi separada das migrações automáticas para impedir que um `db push` a execute antes da nova API. O script do bucket `audios` mantém a leitura pública; não tornar o bucket inteiro privado sem separar primeiro os previews, pois a reprodução pode parar.
 
