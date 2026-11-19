@@ -58,8 +58,8 @@ function corsHeaders(origin: string | null): Headers {
     'Content-Type': 'application/json; charset=utf-8',
     'Cache-Control': 'no-store',
     'Vary': 'Origin',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type'
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
   })
 
   if (origin && allowedOrigins.has(origin)) {
@@ -362,6 +362,116 @@ Deno.serve(async (req: Request) => {
         filename,
         expires_in: 120
       }, 200, origin)
+    }
+
+
+    // Rotas administrativas: exigem sessão Supabase válida e UID explicitamente autorizado.
+    if (path[0] === 'admin' && path[1] === 'beats') {
+      const adminUid = Deno.env.get('ADMIN_USER_ID') ?? '';
+      const authorization = req.headers.get('authorization') ?? '';
+      const tokenMatch = authorization.match(/^Bearer\\s+(.+)$/i);
+      if (!adminUid || !tokenMatch) {
+        return jsonResponse({ error: 'Unauthorized' }, 401, origin);
+      }
+
+      const { data: authData, error: authError } = await supabase.auth.getUser(tokenMatch[1]);
+      if (authError || !authData.user || authData.user.id !== adminUid) {
+        return jsonResponse({ error: 'Forbidden' }, 403, origin);
+      }
+
+      const allowedFields = [
+        'title', 'artist', 'genre', 'price', 'bpm', 'key', 'cover', 'audio',
+        'audio_download_mp3', 'audio_download_wav', 'password',
+        'description', 'license_summary', 'license_terms', 'status'
+      ] as const;
+
+      if (path.length === 2 && req.method === 'GET') {
+        const { data, error } = await supabase
+          .from('beats')
+          .select('*')
+          .order('id', { ascending: false });
+        if (error) {
+          console.error('Admin beats query failed:', error.message);
+          return jsonResponse({ error: 'Unable to load admin beats' }, 500, origin);
+        }
+        return jsonResponse(data ?? [], 200, origin);
+      }
+
+      if (path.length === 2 && req.method === 'POST') {
+        let body: Record<string, unknown>;
+        try { body = await readJson(req); }
+        catch { return jsonResponse({ error: 'Invalid request body' }, 400, origin); }
+
+        const payload: Record<string, unknown> = {};
+        for (const field of allowedFields) {
+          if (Object.prototype.hasOwnProperty.call(body, field)) payload[field] = body[field];
+        }
+        if (typeof payload.title !== 'string' || !payload.title.trim() ||
+            typeof payload.artist !== 'string' || !payload.artist.trim() ||
+            typeof payload.genre !== 'string' || !payload.genre.trim() ||
+            payload.price === undefined || !Number.isFinite(Number(payload.price)) || Number(payload.price) < 0) {
+          return jsonResponse({ error: 'Invalid required beat fields' }, 400, origin);
+        }
+        payload.title = (payload.title as string).trim();
+        payload.artist = (payload.artist as string).trim();
+        payload.genre = (payload.genre as string).trim();
+        payload.status = payload.status === 'published' || payload.status === 'archived' ? payload.status : 'draft';
+
+        const { data, error } = await supabase.from('beats').insert(payload).select('*').single();
+        if (error) {
+          console.error('Admin beat insert failed:', error.message);
+          return jsonResponse({ error: 'Unable to create beat' }, 500, origin);
+        }
+        return jsonResponse(data, 201, origin);
+      }
+
+      if (path.length === 3 && req.method === 'PUT') {
+        const beatId = positiveInteger(path[2]);
+        if (!beatId) return jsonResponse({ error: 'Invalid beat id' }, 400, origin);
+        let body: Record<string, unknown>;
+        try { body = await readJson(req); }
+        catch { return jsonResponse({ error: 'Invalid request body' }, 400, origin); }
+
+        const payload: Record<string, unknown> = {};
+        for (const field of allowedFields) {
+          if (Object.prototype.hasOwnProperty.call(body, field)) payload[field] = body[field];
+        }
+        if (Object.keys(payload).length === 0) return jsonResponse({ error: 'No editable fields supplied' }, 400, origin);
+        if ('price' in payload && (!Number.isFinite(Number(payload.price)) || Number(payload.price) < 0)) {
+          return jsonResponse({ error: 'Invalid price' }, 400, origin);
+        }
+        if ('status' in payload && !['draft', 'published', 'archived'].includes(String(payload.status))) {
+          return jsonResponse({ error: 'Invalid status' }, 400, origin);
+        }
+        for (const field of ['title', 'artist', 'genre'] as const) {
+          if (field in payload && (typeof payload[field] !== 'string' || !(payload[field] as string).trim())) {
+            return jsonResponse({ error: `Invalid ${field}` }, 400, origin);
+          }
+          if (field in payload) payload[field] = (payload[field] as string).trim();
+        }
+
+        const { data, error } = await supabase.from('beats').update(payload).eq('id', beatId).select('*').maybeSingle();
+        if (error) {
+          console.error('Admin beat update failed:', error.message);
+          return jsonResponse({ error: 'Unable to update beat' }, 500, origin);
+        }
+        if (!data) return jsonResponse({ error: 'Beat not found' }, 404, origin);
+        return jsonResponse(data, 200, origin);
+      }
+
+      if (path.length === 3 && req.method === 'DELETE') {
+        const beatId = positiveInteger(path[2]);
+        if (!beatId) return jsonResponse({ error: 'Invalid beat id' }, 400, origin);
+        const { data, error } = await supabase.from('beats').delete().eq('id', beatId).select('id').maybeSingle();
+        if (error) {
+          console.error('Admin beat delete failed:', error.message);
+          return jsonResponse({ error: 'Unable to delete beat' }, 500, origin);
+        }
+        if (!data) return jsonResponse({ error: 'Beat not found' }, 404, origin);
+        return jsonResponse({ success: true, id: data.id }, 200, origin);
+      }
+
+      return jsonResponse({ error: 'Route not found' }, 404, origin);
     }
 
     return jsonResponse({ error: 'Route not found' }, 404, origin)
