@@ -1,0 +1,150 @@
+import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { dirname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const outputDir = resolve(projectRoot, process.env.DIST_DIR || 'dist')
+const apiBaseUrl = (process.env.BEATS_API_BASE_URL ||
+  'https://bbghffltmiqcljuokbgz.supabase.co/functions/v1/api').replace(/\/$/, '')
+const siteOrigin = (process.env.BEATS_SITE_ORIGIN || 'https://beatsao.site').replace(/\/$/, '')
+
+const publicFiles = [
+  'index.html',
+  '404.html',
+  'CNAME',
+  'sitemap.xml',
+  'logo.png',
+  'logo1.png',
+  'eu.jpg',
+  'googlebf9468f7f5a4a305.html'
+]
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[character])
+}
+
+function safeJsonForHtml(value) {
+  return JSON.stringify(value)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+}
+
+async function copyPublicShell() {
+  await rm(outputDir, { recursive: true, force: true })
+  await mkdir(outputDir, { recursive: true })
+
+  for (const relativePath of publicFiles) {
+    try {
+      await cp(join(projectRoot, relativePath), join(outputDir, relativePath))
+    } catch (error) {
+      if (relativePath === 'googlebf9468f7f5a4a305.html') continue
+      throw new Error(`Could not copy ${relativePath}: ${error.message}`)
+    }
+  }
+
+  await cp(join(projectRoot, 'assets'), join(outputDir, 'assets'), { recursive: true })
+  await writeFile(join(outputDir, '.nojekyll'), '')
+}
+
+function buildPage(template, beat) {
+  const title = `${beat.title || 'Beat'} — ${beat.artist || 'Beats Ao'}`
+  const description = (beat.description || beat.license_summary ||
+    `Ouve e descobre ${beat.title || 'este beat'} no Beats Ao.`).slice(0, 155)
+  const canonical = `${siteOrigin}/beats/${encodeURIComponent(beat.slug)}/`
+  const image = typeof beat.cover === 'string' && /^https?:\/\//i.test(beat.cover)
+    ? beat.cover
+    : `${siteOrigin}/logo1.png`
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'MusicRecording',
+    name: beat.title || 'Beat',
+    byArtist: { '@type': 'MusicGroup', name: beat.artist || 'Beats Ao' },
+    genre: beat.genre || undefined,
+    image,
+    url: canonical
+  }
+
+  return template
+    .replace('<title>Beat | Beats Ao</title>', `<title>${escapeHtml(title)}</title>`)
+    .replace('content="Detalhes do beat no Beats Ao."', `content="${escapeHtml(description)}"`)
+    .replace('content="Beat | Beats Ao"', `content="${escapeHtml(title)}"`)
+    .replace('content="Ouve e descobre este beat no Beats Ao."', `content="${escapeHtml(description)}"`)
+    .replace('content="https://beatsao.site/"', `content="${escapeHtml(canonical)}"`)
+    .replace('content="https://beatsao.site/logo1.png"', `content="${escapeHtml(image)}"`)
+    .replace('href="https://beatsao.site/"', `href="${escapeHtml(canonical)}"`)
+    .replace('<script type="application/ld+json" id="detailJsonLd">{}</script>',
+      `<script type="application/ld+json" id="detailJsonLd">${safeJsonForHtml(schema)}</script>`)
+}
+
+async function main() {
+  const response = await fetch(`${apiBaseUrl}/beats`, {
+    headers: { Accept: 'application/json' }
+  })
+
+  if (!response.ok) {
+    throw new Error(`Catalog API returned HTTP ${response.status}; no pages generated.`)
+  }
+
+  const payload = await response.json()
+  if (!Array.isArray(payload)) {
+    throw new Error('Catalog API response must be a JSON array.')
+  }
+
+  const template = await readFile(join(projectRoot, '404.html'), 'utf8')
+  await copyPublicShell()
+
+  const validBeats = payload.filter((beat) =>
+    beat && typeof beat.slug === 'string' &&
+    /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(beat.slug) &&
+    typeof beat.id === 'number'
+  )
+
+  const seenSlugs = new Set()
+  const sitemapEntries = []
+  const lastmod = new Date().toISOString().slice(0, 10)
+
+  for (const beat of validBeats) {
+    if (seenSlugs.has(beat.slug)) {
+      throw new Error(`Duplicate beat slug detected: ${beat.slug}`)
+    }
+    seenSlugs.add(beat.slug)
+
+    const pageDir = join(outputDir, 'beats', beat.slug)
+    await mkdir(pageDir, { recursive: true })
+    await writeFile(join(pageDir, 'index.html'), buildPage(template, beat), 'utf8')
+
+    const canonical = `${siteOrigin}/beats/${encodeURIComponent(beat.slug)}/`
+    sitemapEntries.push([
+      '  <url>',
+      `    <loc>${escapeHtml(canonical)}</loc>`,
+      `    <lastmod>${lastmod}</lastmod>`,
+      '    <changefreq>weekly</changefreq>',
+      '    <priority>0.8</priority>',
+      '  </url>'
+    ].join('\n'))
+  }
+
+  const sitemapPath = join(outputDir, 'sitemap.xml')
+  let sitemap = await readFile(sitemapPath, 'utf8')
+  sitemap = sitemap.replace(/\s*<url>\s*<loc>https:\/\/beatsao\.site\/beats\/.*?<\/url>/gs, '')
+  sitemap = sitemap.replace('</urlset>', `${sitemapEntries.length ? '\n' + sitemapEntries.join('\n') + '\n' : ''}</urlset>`)
+  await writeFile(sitemapPath, sitemap, 'utf8')
+
+  console.log(`Generated static site with ${validBeats.length} beat page(s) in ${outputDir}`)
+  if (validBeats.length !== payload.length) {
+    console.warn(`Skipped ${payload.length - validBeats.length} record(s) with invalid or missing slug/id.`)
+  }
+}
+
+main().catch((error) => {
+  console.error(error.message || error)
+  process.exitCode = 1
+})
