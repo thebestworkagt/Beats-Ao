@@ -537,82 +537,21 @@
       card.appendChild(playerWrapper);
       card.appendChild(infoDiv);
 
-      // ============================================================
-      // ÁUDIO
-      // ============================================================
-      let audio = null;
-      let isPlaying = false;
-
-      playBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        if (!beat.audio) { 
-          showToast('Áudio indisponível', 'Este beat não possui um arquivo de áudio.', 'error'); 
-          return; 
-        }
-        
-        if (!audio) {
-          audio = new Audio(beat.audio);
-          audio.volume = 0.7;
-          
-          audio.addEventListener('timeupdate', () => {
-            if (audio.duration) {
-              const percent = (audio.currentTime / audio.duration) * 100;
-              progress.value = percent;
-              const mins = Math.floor(audio.currentTime / 60);
-              const secs = Math.floor(audio.currentTime % 60);
-              timeDisplay.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-            }
-          });
-          
-          audio.addEventListener('ended', () => {
-            playBtn.innerHTML = '<i class="fas fa-play"></i>';
-            isPlaying = false;
-            progress.value = 0;
-            timeDisplay.textContent = '0:00';
-          });
-        }
-        
-        if (isPlaying) { 
-          audio.pause(); 
-          playBtn.innerHTML = '<i class="fas fa-play"></i>'; 
-          isPlaying = false;
-        } else { 
-          audio.play().catch(() => {});
-          playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-          isPlaying = true;
-          incrementPlays(beat.id);
-        }
-      });
-
-      nextBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!beat.audio) return;
-        if (!audio) {
-          audio = new Audio(beat.audio);
-          audio.volume = 0.7;
-        }
-        audio.currentTime = 0;
-        if (!isPlaying) { 
-          audio.play().catch(() => {}); 
-          playBtn.innerHTML = '<i class="fas fa-pause"></i>'; 
-          isPlaying = true; 
-        }
-      });
-
-      progress.addEventListener('input', function() { 
-        if (audio && audio.duration) {
-          audio.currentTime = (progress.value / 100) * audio.duration; 
-        }
-      });
-
-      volSlider.addEventListener('input', function() {
-        if (audio) {
-          audio.volume = volSlider.value / 100;
-          volIcon.className = audio.volume === 0 ? 'fas fa-volume-mute' : 'fas fa-volume-low';
-        }
+      // PLAYER INDIVIDUAL DO BEAT
+      window.BeatsAoCardPlayer.attach({
+        url: beat.audio,
+        playButton: playBtn,
+        nextButton: nextBtn,
+        progress: progress,
+        timeDisplay: timeDisplay,
+        volumeSlider: volSlider,
+        volumeIcon: volIcon,
+        onPlay: () => incrementPlays(beat.id),
+        onUnavailable: () => showToast(
+          'Áudio indisponível',
+          'Este beat não possui um arquivo de áudio.',
+          'error'
+        )
       });
 
       // DOWNLOAD
