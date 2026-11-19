@@ -12,7 +12,7 @@
 - O frontend força `isLoggedIn = false` e `currentUser = null` durante a inicialização.
 - A versão atualmente publicada da função foi observada a usar `/beats` com `.select('*')`; o candidato versionado substitui isso por uma allowlist.
 - O candidato do frontend mostra MP3/WAV apenas quando `available_formats` confirma disponibilidade; depende da nova Edge Function.
-- A Edge Function candidata está versionada, mas requer as quatro migrações SQL, inventário/migração dos ficheiros e testes antes de publicação.
+- A Edge Function candidata está versionada, mas requer as três migrações automáticas, execução posterior do script manual de grants, migração dos ficheiros e testes antes de publicação.
 
 ## Requisitos funcionais recolhidos
 
@@ -33,7 +33,7 @@
 - Preparado incremento atómico de reproduções em `20261119010000_atomic_beat_plays.sql`; não aplicado.
 - Preparado bucket privado `beat-downloads` e campos de caminho em `20261119030000_private_beat_downloads.sql`; não aplicado.
 - API candidata agora cria URLs assinados de 120 segundos para caminhos privados e já não lê os antigos URLs de download.
-- Preparada revogação dos grants diretos `anon`/`authenticated` em `20261119020000_restrict_direct_table_access.sql`; não aplicada.
+- Preparado o script manual `supabase/manual/restrict_direct_table_access.sql` para revogar grants diretos `anon`/`authenticated`; ainda não aplicado. Foi retirado da pasta automática de migrações para não correr antes da publicação da nova API.
 - Edge Function passou a usar `SUPABASE_SECRET_KEYS` apenas no servidor, para permitir retirar o acesso direto do browser às tabelas.
 - Frontend passou a consumir `available_formats` para mostrar apenas os formatos existentes.
 - Criado o contrato de allowlist da API em `docs/API-PUBLICA-BEATS.md`.
@@ -58,7 +58,7 @@
 
 ### Fase 1 — segurança e contrato da API
 - Rever e testar a Edge Function candidata antes da publicação.
-- Aplicar em ambiente de teste as quatro migrações de campos públicos, contador atómico, Storage privado e grants restritos.
+- Aplicar em ambiente de teste as três migrações automáticas; publicar e testar a API; só depois executar o script manual de grants restritos.
 - Definir autenticação administrativa no servidor.
 - Separar campos públicos de campos privados.
 - Remover segredos e URLs protegidas das respostas públicas.
