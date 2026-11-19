@@ -13,6 +13,10 @@ supabase/
     └── YYYYMMDDHHMMSS_descricao.sql
 ```
 
+## Procedimentos
+
+- `docs/MIGRACAO-STORAGE.md`: inventário somente de leitura, transferência dos downloads para o bucket privado e limpeza segura dos objetos públicos antigos.
+
 ## Migrações preparadas
 
 - `migrations/20261119000000_add_beat_detail_fields.sql`: adiciona descrição, resumo/termos de licença e estado de publicação.
