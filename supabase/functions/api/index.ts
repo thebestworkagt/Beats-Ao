@@ -49,8 +49,8 @@ type PublicBeat = {
   description: string | null
   license_summary: string | null
   license_terms: string | null
-  audio_download_mp3: string | null
-  audio_download_wav: string | null
+  download_mp3_path: string | null
+  download_wav_path: string | null
 }
 
 function corsHeaders(origin: string | null): Headers {
@@ -97,8 +97,8 @@ function toPublicBeat(beat: PublicBeat) {
     license_summary: beat.license_summary,
     license_terms: beat.license_terms,
     available_formats: {
-      mp3: Boolean(beat.audio_download_mp3),
-      wav: Boolean(beat.audio_download_wav)
+      mp3: Boolean(beat.download_mp3_path),
+      wav: Boolean(beat.download_wav_path)
     }
   }
 }
@@ -125,6 +125,151 @@ async function readJson(req: Request): Promise<Record<string, unknown>> {
 function positiveInteger(value: unknown): number | null {
   const number = typeof value === 'number' ? value : Number(value)
   return Number.isSafeInteger(number) && number > 0 ? number : null
+}
+
+function isValidPrivatePath(
+  value: unknown,
+  beatId: number,
+  format: 'mp3' | 'wav'
+): value is string {
+  if (typeof value !== 'string' || value.length > 512) return false
+
+  const prefix = `beats/${beatId}/${format}/`
+  if (!value.startsWith(prefix)) return false
+
+  const filename = value.slice(prefix.length)
+  const escapedFormat = format === 'mp3' ? 'mp3' : 'wav'
+  return new RegExp(`^[A-Za-z0-9][A-Za-z0-9_-]{0,100}\\.${escapedFormat}import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+const secretKeysRaw = Deno.env.get('SUPABASE_SECRET_KEYS') ?? ''
+
+let secretKeys: Record<string, string>
+try {
+  secretKeys = JSON.parse(secretKeysRaw) as Record<string, string>
+} catch {
+  throw new Error('Invalid Supabase secret-key configuration')
+}
+
+const supabaseSecretKey = secretKeys.default
+
+if (!supabaseUrl || !supabaseSecretKey) {
+  throw new Error('Missing Supabase server configuration')
+}
+
+// Este cliente privilegiado só existe no servidor da Edge Function.
+// Nunca copiar SUPABASE_SECRET_KEYS ou a chave obtida daqui para o frontend.
+const supabase = createClient(supabaseUrl, supabaseSecretKey, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+    detectSessionInUrl: false
+  }
+})
+
+const allowedOrigins = new Set([
+  'https://beatsao.site',
+  'https://www.beatsao.site',
+  'https://thebestworkagt.github.io'
+])
+
+const maxBodyBytes = 8 * 1024
+
+type PublicBeat = {
+  id: number
+  title: string
+  artist: string
+  genre: string | null
+  price: string
+  bpm: number | null
+  key: string | null
+  cover: string | null
+  audio: string | null
+  slug: string
+  plays: number | null
+  description: string | null
+  license_summary: string | null
+  license_terms: string | null
+  download_mp3_path: string | null
+  download_wav_path: string | null
+}
+
+function corsHeaders(origin: string | null): Headers {
+  const headers = new Headers({
+    'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': 'no-store',
+    'Vary': 'Origin',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type'
+  })
+
+  if (origin && allowedOrigins.has(origin)) {
+    headers.set('Access-Control-Allow-Origin', origin)
+  }
+
+  return headers
+}
+
+function jsonResponse(
+  body: unknown,
+  status = 200,
+  origin: string | null = null
+): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: corsHeaders(origin)
+  })
+}
+
+function toPublicBeat(beat: PublicBeat) {
+  return {
+    id: beat.id,
+    title: beat.title,
+    artist: beat.artist,
+    genre: beat.genre,
+    price: beat.price,
+    bpm: beat.bpm,
+    key: beat.key,
+    cover: beat.cover,
+    audio: beat.audio,
+    slug: beat.slug,
+    plays: beat.plays ?? 0,
+    description: beat.description,
+    license_summary: beat.license_summary,
+    license_terms: beat.license_terms,
+    available_formats: {
+      mp3: Boolean(beat.download_mp3_path),
+      wav: Boolean(beat.download_wav_path)
+    }
+  }
+}
+
+async function readJson(req: Request): Promise<Record<string, unknown>> {
+  const contentLength = Number(req.headers.get('content-length') || 0)
+  if (contentLength > maxBodyBytes) {
+    throw new Error('Request body too large')
+  }
+
+  const raw = await req.text()
+  if (new TextEncoder().encode(raw).byteLength > maxBodyBytes) {
+    throw new Error('Request body too large')
+  }
+
+  const parsed: unknown = raw ? JSON.parse(raw) : {}
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('Invalid JSON body')
+  }
+
+  return parsed as Record<string, unknown>
+}
+
+function positiveInteger(value: unknown): number | null {
+  const number = typeof value === 'number' ? value : Number(value)
+  return Number.isSafeInteger(number) && number > 0 ? number : null
+}
+
+, 'i')
+    .test(filename)
 }
 
 function safeFilename(title: string, extension: string): string {
@@ -163,8 +308,8 @@ Deno.serve(async (req: Request) => {
         .select([
           'id', 'title', 'artist', 'genre', 'price', 'bpm', 'key',
           'cover', 'audio', 'slug', 'plays', 'description',
-          'license_summary', 'license_terms', 'audio_download_mp3',
-          'audio_download_wav', 'status'
+          'license_summary', 'license_terms', 'download_mp3_path',
+          'download_wav_path', 'status'
         ].join(','))
         .eq('status', 'published')
         .order('id', { ascending: false })
@@ -285,9 +430,8 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ success: true }, 201, origin)
     }
 
-    // POST /download — compatibilidade temporária com o fluxo atual.
-    // A coluna password continua a ser texto simples; substituir por autorização
-    // real e Storage privado antes de disponibilizar downloads comerciais.
+    // POST /download — assina por 120 segundos um objeto no bucket privado.
+    // A password atual continua sendo um controle legado e não substitui compra/licença.
     if (path.length === 1 && path[0] === 'download' && req.method === 'POST') {
       let body: Record<string, unknown>
       try {
@@ -300,7 +444,7 @@ Deno.serve(async (req: Request) => {
       const format = typeof body.format === 'string' ? body.format.toLowerCase() : ''
       const beatSlug = typeof body.beatSlug === 'string' ? body.beatSlug.trim() : ''
 
-      if (!password || password.length > 256 || !['mp3', 'wav'].includes(format)) {
+      if (!password || password.length > 256 || (format !== 'mp3' && format !== 'wav')) {
         return jsonResponse({ success: false, error: 'Dados de download inválidos' }, 400, origin)
       }
       if (!beatSlug || beatSlug.length > 160) {
@@ -309,7 +453,7 @@ Deno.serve(async (req: Request) => {
 
       const { data: beat, error } = await supabase
         .from('beats')
-        .select('title,password,audio_download_mp3,audio_download_wav,status')
+        .select('id,title,password,download_mp3_path,download_wav_path,status')
         .eq('slug', beatSlug)
         .eq('status', 'published')
         .maybeSingle()
@@ -322,15 +466,27 @@ Deno.serve(async (req: Request) => {
         return jsonResponse({ success: false, error: 'Senha incorreta ou beat indisponível' }, 401, origin)
       }
 
-      const url = format === 'mp3' ? beat.audio_download_mp3 : beat.audio_download_wav
-      if (typeof url !== 'string' || !url.trim()) {
-        return jsonResponse({ success: false, error: 'Este formato não está disponível' }, 404, origin)
+      const storedPath = format === 'mp3' ? beat.download_mp3_path : beat.download_wav_path
+      if (!isValidPrivatePath(storedPath, beat.id, format)) {
+        return jsonResponse({ success: false, error: 'Este formato ainda não está disponível no armazenamento privado' }, 404, origin)
+      }
+
+      const filename = safeFilename(beat.title ?? 'beat', format)
+      const { data: signedData, error: signedError } = await supabase
+        .storage
+        .from('beat-downloads')
+        .createSignedUrl(storedPath, 120, { download: filename })
+
+      if (signedError || !signedData?.signedUrl) {
+        console.error('Private download signing failed:', signedError?.message ?? 'Missing signed URL')
+        return jsonResponse({ success: false, error: 'Não foi possível preparar o download' }, 500, origin)
       }
 
       return jsonResponse({
         success: true,
-        url,
-        filename: safeFilename(beat.title ?? 'beat', format)
+        url: signedData.signedUrl,
+        filename,
+        expires_in: 120
       }, 200, origin)
     }
 
