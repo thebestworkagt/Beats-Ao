@@ -21,6 +21,21 @@ supabase/
 
 As três migrações ainda não foram aplicadas.
 
+## Ordem obrigatória de publicação
+
+A ordem abaixo evita interromper a API antiga antes de a versão privilegiada estar ativa:
+
+1. Fazer backup e testar numa instância de desenvolvimento.
+2. Aplicar `20261119000000_add_beat_detail_fields.sql`.
+3. Aplicar `20261119010000_atomic_beat_plays.sql`.
+4. Publicar `functions/api/index.ts` e confirmar que a função lê `SUPABASE_SECRET_KEYS` no runtime.
+5. Testar `GET /beats`, `GET /beat/:slug`, `GET /ratings`, `POST /play`, `POST /rate` e `POST /download` num beat de teste.
+6. Só depois de confirmar que todas as rotas necessárias funcionam, aplicar `20261119020000_restrict_direct_table_access.sql`.
+7. Testar que as consultas diretas às tabelas falham com a chave pública e que a Edge Function continua a funcionar.
+8. Publicar o frontend que lê `available_formats`; testar MP3, WAV e beat sem ficheiros disponíveis.
+
+**Nunca executar o passo 6 antes do passo 4 e da validação do passo 5.** Caso contrário, a função antiga, que usa a chave pública, pode perder acesso às tabelas.
+
 ## Edge Function versionada
 
 O candidato está em `functions/api/index.ts`. Mantém os caminhos utilizados pelo frontend e acrescenta `GET /beat/:slug`. Usa `SUPABASE_SECRET_KEYS` (chave `default`) exclusivamente no servidor; não usa a chave pública para consultar colunas privadas. A configuração `config.toml` define `verify_jwt = false` porque o browser chama estas rotas públicas sem JWT; a própria função aplica validações e nunca devolve a chave.
