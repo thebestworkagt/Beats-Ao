@@ -13,6 +13,7 @@ assets/js/
     notifications.js
   features/
     cart.js
+    playlist-player.js
     playlist.js
     profile-privacy.js
     ratings.js
@@ -30,6 +31,7 @@ assets/js/
 | `features/theme.js` | Carregar e alternar tema | `window.BeatsAoTheme` |
 | `features/profile-privacy.js` | Privacidade do email do perfil | `window.BeatsAoProfilePrivacy` |
 | `features/playlist.js` | Persistência e operações da playlist | `window.BeatsAoPlaylist` |
+| `features/playlist-player.js` | Reprodução, pausa, progresso e limpeza do áudio da playlist | `window.BeatsAoPlaylistPlayer` |
 | `features/cart.js` | Persistência, inclusão, remoção, total e contador do carrinho | `window.BeatsAoCart` |
 | `features/ratings.js` | Carregar, submeter e calcular avaliações | `window.BeatsAoRatings` |
 
@@ -39,7 +41,7 @@ Os módulos são carregados antes de `app.js` em `index.html`. O ficheiro princi
 
 - Catálogo: carregamento, pesquisa, filtros e renderização dos cards.
 - Player dos cards: cada card cria e controla o seu próprio objeto `Audio`.
-- Player da playlist: usa um objeto `Audio` partilhado, com progresso e tempo.
+- Player da playlist: agora usa `features/playlist-player.js`, que gere o objeto `Audio` partilhado, progresso, tempo e limpeza ao parar.
 - Modais de carrinho e playlist.
 - Integração visual das avaliações.
 - Downloads, autenticação atualmente desativada, formulário e eventos.
@@ -52,7 +54,7 @@ Existem dois contextos distintos de reprodução: o áudio individual de cada ca
 ## Ordem de trabalho proposta
 
 1. Validar módulos já extraídos no navegador e corrigir inconsistências documentais.
-2. Isolar o player da playlist, mantendo o player de cada card funcional.
+2. Isolar o player de cada card, mantendo o player da playlist já extraído funcional.
 3. Definir o contrato de dados e a rota de detalhe individual de cada beat.
 4. Implementar páginas de beat com URL amigável e carregamento por slug.
 5. Redesenhar os cards e a página individual com base no contrato definitivo.
