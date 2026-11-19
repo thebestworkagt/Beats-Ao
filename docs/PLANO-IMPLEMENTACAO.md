@@ -12,7 +12,7 @@
 - O frontend força `isLoggedIn = false` e `currentUser = null` durante a inicialização.
 - A versão atualmente publicada da função foi observada a usar `/beats` com `.select('*')`; o candidato versionado substitui isso por uma allowlist.
 - O candidato do frontend mostra MP3/WAV apenas quando `available_formats` confirma disponibilidade; depende da nova Edge Function.
-- A Edge Function candidata está versionada, mas requer as duas migrações SQL e testes antes de publicação.
+- A Edge Function candidata está versionada, mas requer as quatro migrações SQL, inventário/migração dos ficheiros e testes antes de publicação.
 
 ## Requisitos funcionais recolhidos
 
@@ -47,7 +47,7 @@
 - As rotas de avaliação aceitam um `userId` enviado pelo cliente, que não é uma identidade autenticada confiável.
 - A contagem de reproduções é feita por leitura seguida de atualização, não sendo atómica.
 - O CORS permite qualquer origem; isto não substitui nem resolve autorização.
-- Na auditoria SQL anterior foram observados privilégios excessivos para `anon` e `authenticated`, políticas permissivas e políticas de Storage públicas para o bucket `audios`. A migração deve ser preparada após validar o modelo de autenticação e o acesso legítimo aos ficheiros.
+- Na auditoria SQL anterior foram observados privilégios excessivos para `anon` e `authenticated`, políticas permissivas e políticas de Storage públicas para o bucket `audios`. Foram preparadas migrações, mas ainda não foram aplicadas; é preciso testar a ordem de publicação e separar os previews dos downloads no Storage.
 
 ## Ordem de execução
 
@@ -58,7 +58,7 @@
 
 ### Fase 1 — segurança e contrato da API
 - Rever e testar a Edge Function candidata antes da publicação.
-- Aplicar em ambiente de teste as migrações de campos públicos e contador atómico.
+- Aplicar em ambiente de teste as quatro migrações de campos públicos, contador atómico, Storage privado e grants restritos.
 - Definir autenticação administrativa no servidor.
 - Separar campos públicos de campos privados.
 - Remover segredos e URLs protegidas das respostas públicas.
