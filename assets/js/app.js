@@ -1138,7 +1138,39 @@
     }
 
     // ============================================================
-    // 21. AUTH - LOGIN ADMINISTRATIVO
+    // 21. AUTH - RECUPERAÇÃO DE SENHA POR EMAIL
+    // ============================================================
+    async function requestPasswordRecovery() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const errorBox = document.getElementById('loginError');
+      errorBox.style.display = 'none';
+      if (!email) {
+        errorBox.textContent = 'Introduz o email da conta administrativa primeiro.';
+        errorBox.style.display = 'block';
+        document.getElementById('loginEmail').focus();
+        return;
+      }
+      const button = document.getElementById('forgotPasswordBtn');
+      button.disabled = true;
+      button.textContent = 'A enviar...';
+      try {
+        const { error } = await BeatsAoApi.auth.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + '/'
+        });
+        if (error) throw error;
+        showToast('Pedido enviado', 'Se o email estiver registado, receberás um link para definir uma nova senha. Abre-o neste endereço de teste.', 'success', 6500);
+      } catch (error) {
+        console.error('Password reset request failed:', error);
+        errorBox.textContent = error.message || 'Não foi possível enviar o link de recuperação.';
+        errorBox.style.display = 'block';
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Esqueci a senha';
+      }
+    }
+
+    // ============================================================
+    // 22. AUTH - LOGIN ADMINISTRATIVO
     // ============================================================
     async function doLogin(e) {
       e.preventDefault();
@@ -1213,6 +1245,7 @@
     });
     document.getElementById('loginCancel').addEventListener('click', () => document.getElementById('loginModal').classList.remove('active'));
     document.getElementById('loginForm').addEventListener('submit', doLogin);
+    document.getElementById('forgotPasswordBtn').addEventListener('click', requestPasswordRecovery);
     document.getElementById('beatForm').addEventListener('submit', saveBeat);
     
     document.getElementById('dropdownNewBeat').addEventListener('click', () => openFormModal());
