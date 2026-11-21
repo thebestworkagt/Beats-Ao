@@ -18,6 +18,14 @@
     let selectedCoverFile = null;
     let currentBeatId = null;
     let selectedFormat = null;
+
+    // Captura o fluxo de recuperação antes de o Supabase limpar o fragmento da URL.
+    let recoveryRequested = /(?:^|[&#])type=recovery(?:&|$)/.test(window.location.hash.slice(1))
+      || new URLSearchParams(window.location.search).get('type') === 'recovery';
+
+    BeatsAoApi.auth.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') recoveryRequested = true;
+    });
     
 
     // ============================================================
@@ -1052,7 +1060,85 @@
     }
 
     // ============================================================
-    // 20. AUTH - FUNÇÕES DESATIVADAS
+    // 20. RECUPERAÇÃO DE SENHA
+    // ============================================================
+    function openPasswordRecovery() {
+      let modal = document.getElementById('passwordRecoveryModal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'passwordRecoveryModal';
+        modal.className = 'modal-overlay';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-labelledby', 'passwordRecoveryTitle');
+        modal.innerHTML = `
+          <div class="modal">
+            <h2 id="passwordRecoveryTitle"><i class="fas fa-lock"></i> Definir nova senha</h2>
+            <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1rem;">Crie uma nova senha para a sua conta administrativa.</p>
+            <form id="passwordRecoveryForm">
+              <label for="recoveryPassword">Nova senha</label>
+              <input id="recoveryPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="Mínimo de 8 caracteres">
+              <label for="recoveryPasswordConfirm">Confirmar nova senha</label>
+              <input id="recoveryPasswordConfirm" type="password" autocomplete="new-password" minlength="8" required placeholder="Repita a nova senha">
+              <p id="passwordRecoveryError" class="login-error" role="alert"></p>
+              <div class="modal-actions">
+                <button class="btn-save" id="passwordRecoverySubmit" type="submit">Guardar nova senha</button>
+              </div>
+            </form>
+          </div>`;
+        document.body.appendChild(modal);
+        modal.querySelector('#passwordRecoveryForm').addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const password = modal.querySelector('#recoveryPassword').value;
+          const confirmation = modal.querySelector('#recoveryPasswordConfirm').value;
+          const errorBox = modal.querySelector('#passwordRecoveryError');
+          const submit = modal.querySelector('#passwordRecoverySubmit');
+          errorBox.style.display = 'none';
+          if (password.length < 8) {
+            errorBox.textContent = 'A senha deve ter pelo menos 8 caracteres.';
+            errorBox.style.display = 'block';
+            return;
+          }
+          if (password !== confirmation) {
+            errorBox.textContent = 'As senhas não coincidem.';
+            errorBox.style.display = 'block';
+            return;
+          }
+          submit.disabled = true;
+          submit.textContent = 'A guardar...';
+          try {
+            const { data, error } = await BeatsAoApi.auth.auth.updateUser({ password });
+            if (error) throw error;
+            if (!data?.user) throw new Error('O Supabase não confirmou a alteração da senha.');
+            await BeatsAoApi.auth.auth.signOut();
+            window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+            modal.querySelector('.modal').innerHTML = `
+              <h2><i class="fas fa-check-circle"></i> Senha atualizada</h2>
+              <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:1rem;">A nova senha foi guardada. Entre novamente com a nova senha.</p>
+              <div class="modal-actions">
+                <button class="btn-primary" id="passwordRecoveryGoLogin" type="button">Ir para o início de sessão</button>
+              </div>`;
+            modal.querySelector('#passwordRecoveryGoLogin').addEventListener('click', () => {
+              modal.classList.remove('active');
+              document.getElementById('loginModal').classList.add('active');
+              document.getElementById('loginError').style.display = 'none';
+              document.getElementById('loginEmail').focus();
+            });
+          } catch (error) {
+            console.error('Password recovery failed:', error);
+            errorBox.textContent = error.message || 'Não foi possível atualizar a senha. Solicite um novo link de recuperação.';
+            errorBox.style.display = 'block';
+            submit.disabled = false;
+            submit.textContent = 'Guardar nova senha';
+          }
+        });
+      }
+      modal.classList.add('active');
+      modal.querySelector('#recoveryPassword')?.focus();
+    }
+
+    // ============================================================
+    // 21. AUTH - LOGIN ADMINISTRATIVO
     // ============================================================
     async function doLogin(e) {
       e.preventDefault();
@@ -1110,7 +1196,7 @@
     }
 
     // ============================================================
-    // 21. EVENTOS
+    // 22. EVENTOS
     // ============================================================
     document.getElementById('menuBtn').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1254,7 +1340,7 @@
     });
 
     // ============================================================
-    // 22. INIT
+    // 23. INIT
     // ============================================================
     async function init() {
       loadTheme();
@@ -1278,6 +1364,9 @@
       }
       await loadBeats();
       updateUI();
+      if (recoveryRequested) {
+        openPasswordRecovery();
+      }
       console.log('Beats Ao v1.0 - Supabase Edge Function');
       console.log('📱 WhatsApp: +244 926 261 011');
       console.log('📧 Email: agtbeatsxpalha@email.com');
