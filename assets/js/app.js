@@ -1346,7 +1346,18 @@
       loadTheme();
       isLoggedIn = false;
       currentUser = null;
-      const { data: sessionData } = await BeatsAoApi.auth.auth.getSession();
+
+      // Um link de recuperação tem prioridade sobre o arranque normal do painel.
+      // Não validar nem terminar a sessão administrativa antes de atualizar a senha.
+      const { data: sessionData, error: sessionError } = await BeatsAoApi.auth.auth.getSession();
+      if (recoveryRequested) {
+        if (sessionError) {
+          console.error('Recovery session could not be loaded:', sessionError);
+        }
+        openPasswordRecovery();
+        return;
+      }
+
       const savedUser = sessionData?.session?.user;
       if (savedUser?.id === 'da274bef-08da-44e7-bd8f-0541c3847273') {
         try {
@@ -1362,11 +1373,9 @@
       } else if (savedUser) {
         await BeatsAoApi.auth.auth.signOut();
       }
+
       await loadBeats();
       updateUI();
-      if (recoveryRequested) {
-        openPasswordRecovery();
-      }
       console.log('Beats Ao v1.0 - Supabase Edge Function');
       console.log('📱 WhatsApp: +244 926 261 011');
       console.log('📧 Email: agtbeatsxpalha@email.com');
